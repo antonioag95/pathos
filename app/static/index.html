@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotion Analysis App</title>
+  <!-- Include Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Include Font Awesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Custom Styles */
+    [v-cloak] {
+      display: block;
+      padding: 50px 0;
+    }
+    @keyframes spinner {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    [v-cloak]:before {
+      content: "";
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      margin-top: -10px;
+      margin-left: -10px;
+      border-radius: 50%;
+      border: 4px solid #198754; /* Green border color */
+      border-top-color: #20c997; /* Lighter green for animation */
+      animation: spinner 0.6s linear infinite;
+      text-indent: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    [v-cloak]>* {
+        display: none;
+    }
+    body {
+      background-color: #f8f9fa;
+      position: relative; /* Ensure relative positioning for footer */
+      min-height: 100vh; /* Ensure full height of viewport */
+    }
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      position: relative;
+      margin-top: 40px; /* Adjust margin as needed */
+      height: 320px; /* Adjust height as needed */
+    }
+    textarea {
+      resize: none;
+    }
+    .btn-primary {
+      background-color: #4CAF50; /* Green */
+      border-color: #4CAF50; /* Green */
+    }
+    .btn-primary:hover {
+      background-color: #45a049; /* Darker Green */
+      border-color: #45a049; /* Darker Green */
+    }
+    .spinner-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .spinner-border {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -12px; /* Half of the spinner's height */
+      margin-left: -12px; /* Half of the spinner's width */
+    }
+    .char-count {
+      font-size: 12px;
+      color: #6c757d;
+      position: absolute;
+      bottom: -10px; /* Adjust position as needed */
+      right: 0; /* Adjust position as needed */
+      z-index: 1; /* Ensure it's above the textarea */
+    }
+    .form-control {
+      height: 150px; /* Set a fixed height */
+      border-radius: 0.5rem;
+      background-color: #fff; /* White background */
+    }
+    .text-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px; /* Increase margin as needed */
+    }
+    .btn-primary:disabled {
+      background-color: #6c757d; /* Light mode background color */
+      border-color: #6c757d; /* Light mode border color */
+      color: #fff; /* Light mode text color */
+    }
+
+    .btn-primary:disabled:hover {
+      background-color: #6c757d; /* Light mode hover background color */
+      border-color: #6c757d; /* Light mode hover border color */
+      color: #fff; /* Light mode hover text color */
+    }
+    .banner {
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 50px; /* Adjust height as needed */
+      background-color: #198754; /* Darker Green */
+      border: none; /* Remove border */
+      border-radius: 1rem; /* Match border-radius of the card */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* Match box-shadow of the card */
+      z-index: -1;
+    }
+    .alert-container {
+      position: relative;
+      z-index: 1;
+    }
+    .analysis-result {
+      background-color: #f8f9fa;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      margin-top: 20px;
+    }
+    .analysis-result h2 {
+      margin-top: 0;
+      color: #198754;
+    }
+    .analysis-result p {
+      margin-bottom: 0.5rem;
+      color: #6c757d;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: -3px;
+      font-size: 20px; /* Adjust font size */
+      padding: 5px 8px; /* Adjust padding */
+      border: none;
+      background-color: transparent;
+      color: #6c757d;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      color: #000;
+    }
+    .language-code {
+      font-size: 12px;
+      color: #6c757d;
+      position: absolute;
+      bottom: -10px; /* Adjust position as needed */
+      left: 0; /* Adjust position as needed */
+      z-index: 1; /* Ensure it's above the textarea */
+    }
+    .loading-overlay::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000; /* Ensure it's above other content */
+      background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white for light theme */
+    }
+    .card-body.loading-overlay::before {
+      background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white for light theme */
+    }
+    /* Debug button style */
+    .debug-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10000; /* Ensure debug button is above console */
+      border: none;
+      background-color: transparent;
+      color: inherit;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Debug console style */
+    .debug-console {
+      display: none; /* Initially hide the console */
+      position: fixed;
+      bottom: 65px; /* Adjust as needed */
+      left: 0;
+      right: 0;
+      z-index: 9999;
+    }
+
+    .debug-content {
+      overflow-y: auto; /* Enable vertical scrolling */
+      background-color: #1e1e1e;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      color: #4caf50;
+      height: 100px; /* Set a fixed height */
+    }
+    .debug-content pre {
+      overflow: initial; /* Disable horizontal scrollbar for pre elements within debug-content */
+    }
+    /* Scrollbar style for both horizontal and vertical */
+    .debug-content::-webkit-scrollbar {
+      width: 6px; /* Set width to match custom scrollbar */
+      height: 6px; /* Set height to match custom scrollbar */
+    }
+
+    .debug-content::-webkit-scrollbar-track {
+      background: transparent; /* Set to transparent */
+    }
+
+    .debug-content::-webkit-scrollbar-thumb {
+      background-color: #4caf50; /* Match color of custom scrollbar thumb */
+      border-radius: 3px; /* Adjust border radius if necessary */
+    }
+
+    .debug-content::-webkit-scrollbar-thumb:hover {
+      background-color: #3d8e41; /* Match color of custom scrollbar thumb on hover */
+    }
+
+    pre::-webkit-scrollbar {
+      width: 6px; /* Set width to match custom scrollbar */
+      height: 6px; /* Set height to match custom scrollbar */
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: transparent; /* Set to transparent */
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background-color: #4caf50; /* Match color of custom scrollbar thumb */
+      border-radius: 3px; /* Adjust border radius if necessary */
+    }
+
+    pre::-webkit-scrollbar-thumb:hover {
+      background-color: #3d8e41; /* Match color of custom scrollbar thumb on hover */
+    }
+    .visible {
+      display: block !important;
+    }
+    .toast {
+      width: auto; /* Adjust width automatically based on content */
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out; /* Adjust the duration and easing as needed */
+    }
+    .report-btn {
+      position: absolute;
+      top: 10px;
+      left: 0px;
+      font-size: 12px;
+      padding: 13px 8px;
+      border: none;
+      background-color: transparent;
+      color: #6c757d; /* Dark grey color */
+      cursor: pointer;
+    }
+    .report-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* Ensure it's above other content */
+    }
+
+    .overlay-content {
+      background-color: #fff; /* White background */
+      padding: 40px; /* Increase padding as needed */
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+      max-width: 100%; /* Ensure the overlay is as wide as the card */
+      max-height: 320px; /* Match the height of the card */
+      width: 300px;
+      overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+    }
+
+    .overlay-content h3 {
+      margin-top: 0;
+    }
+
+    .overlay-content label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .overlay-content select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ced4da; /* Add a border to the select */
+      border-radius: 0.25rem; /* Add border radius */
+      background-color: #fff; /* White background */
+      color: #212529; /* Dark text color */
+    }
+
+    .overlay-content option {
+      background-color: #fff; /* White background for options */
+      color: #212529; /* Dark text color for options */
+    }
+
+    .overlay-content button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      color: #fff; /* White text color */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    /* Footer styles */
+    .footer {
+      background-color: #f8f9fa; /* Match the background color of the body */
+      padding: 10px 0; /* Add some padding for better spacing */
+      text-align: center; /* Align text to the center */
+      position: fixed; /* Position the footer at the bottom */
+      width: 100%; /* Ensure the footer spans the full width */
+      bottom: 0; /* Position the footer at the bottom of the viewport */
+      left: 0; /* Align the footer to the left */
+      font-size: 12px; /* Set smaller font size */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: "Twemoji Country Flags", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important ;
+    }
+    .footer p {
+      margin: 0;
+      padding: 0;
+    }
+    .spinner-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .spinner-border {
+      color: #198754 !important; /* Set the color to match your palette */
+    }
+    /* Dark mode */
+    body.dark-mode {
+      background-color: #212529;
+      color: #f8f9fa;
+    }
+    .dark-mode .card {
+      background-color: #343a40;
+      color: #adb5bd;
+    }
+    .dark-mode .btn-primary {
+      background-color: #20c997; /* Teal */
+      border-color: #20c997; /* Teal */
+    }
+    .dark-mode .btn-primary:hover {
+      background-color: #198754; /* Darker Green */
+      border-color: #198754; /* Darker Green */
+    }
+    .dark-mode .char-count {
+      color: #adb5bd;
+    }
+    .dark-mode .form-control {
+      background-color: #495057; /* Darker grey */
+      color: #f8f9fa; /* Light grey */
+    }
+    .dark-mode ::placeholder {
+      color: #adb5bd; /* Light grey */
+    }
+    .dark-mode .analysis-result {
+      background-color: #343a40;
+      border-color: #495057;
+      color: #adb5bd;
+    }
+    .dark-mode .analysis-result h2 {
+      color: #20c997;
+    }
+    .dark-mode .analysis-result p {
+      color: #adb5bd;
+    }
+    .dark-mode .close-btn {
+      color: #adb5bd; /* Adjust color for dark mode */
+    }
+    .dark-mode .close-btn:hover {
+      color: #fff; /* Adjust color for dark mode on hover */
+    }
+    .dark-mode .language-code {
+      color: #adb5bd;
+    }
+    .dark-mode .card-body.loading-overlay::before {
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black for dark theme */
+    }
+    .dark-mode .footer {
+      background-color: #212529; /* Dark background color for dark mode */
+      color: #adb5bd; /* Text color for dark mode */
+    }
+    .dark-mode .btn-primary:disabled {
+      background-color: #6c757d; /* Dark mode background color */
+      border-color: #6c757d; /* Dark mode border color */
+      color: #212529; /* Dark mode text color */
+    }
+
+    .dark-mode .btn-primary:disabled:hover {
+      background-color: #6c757d; /* Dark mode hover background color */
+      border-color: #6c757d; /* Dark mode hover border color */
+      color: #212529; /* Dark mode hover text color */
+    }
+    /* Dark mode toggle button */
+    .dark-mode-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      border: none;
+      background-color: transparent;
+      color: inherit;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .dark-mode .report-btn {
+      color: #adb5bd; /* Light grey color */
+    }
+    .overlay-content.dark-mode {
+      background-color: #343a40; /* Dark background color */
+      color: #adb5bd; /* Text color in dark mode */
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Shadow effect in dark mode */
+    }
+    .overlay-content.dark-mode button {
+      background-color: #20c997; /* Teal button color in dark mode */
+    }
+    .dark-mode .overlay-content {
+      background-color: #343a40; /* Dark background color */
+      color: #adb5bd; /* Text color in dark mode */
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Shadow effect in dark mode */
+    }
+    .dark-mode .overlay-content select {
+      background-color: #495057; /* Darker grey background */
+      color: #f8f9fa; /* Light text color */
+      border: none; /* Remove border */
+      border-radius: 0.25rem; /* Adjust border radius as needed */
+      padding: 8px; /* Adjust padding as needed */
+    }
+
+    .dark-mode .overlay-content option {
+      background-color: #343a40; /* Dark background color */
+      color: #adb5bd; /* Light text color */
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container-fluid" v-cloak>
+    <div class="toast-container position-absolute p-3 top-0 end-0" id="toastPlacement">
+      <div class="toast align-items-center text-white bg-danger border-0 fade-in" :class="{ 'show': errorMessage }" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ errorMessage }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" @click="clearErrorMessage" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center position-relative" :class="{ 'loading-overlay': loading }">
+            <h1 class="card-title text-center mb-4">{{ $t.emotion_detection }}</h1>
+            <div class="text-container">
+              <textarea class="form-control mb-3" v-model="textInput" :placeholder="$t.textarea_placeholder" @input="updateCharCountAndDetectLanguage"></textarea>
+              <div class="char-count">{{ charLimit - textInput.trim().length }} {{ $t.chars_remaining }}</div>
+              <!-- New element for displaying language code -->
+              <div class="language-code">{{ textInput.trim().length < 60 ? `${60 - textInput.trim().length} ${$t.chars_to_lang}` : `${detectedLanguage}` }}</div>
+            </div>
+            <button @click="analyzeText" class="btn btn-primary btn-block mb-3" :disabled="textInput.length <= 15">{{ $t.analyze }}</button>
+            <transition name="fade">
+              <div v-if="loading" class="text-center spinner-container">
+                <div class="overlay"></div>
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">{{ $t.loading }}</span>
+                </div>
+              </div>
+            </transition>
+            <div v-if="analysisResult" class="mt-3 position-relative fade-in">
+              <div class="banner" :style="{ backgroundColor: analysisResult.sentiment === 'positive' ? '#198754' : '#dc3545' }"></div>
+              <div class="analysis-result">
+                <!-- Close button -->
+                <button @click="closeAnalysisResult" class="close-btn">&times;</button>
+                <!-- Report button -->
+                <button @click="toggleReportOverlay" class="report-btn">
+                  <i class="fas fa-flag"></i>
+                </button>
+                <!-- Report overlay -->
+                <div class="report-overlay" v-if="reportOverlayVisible" @click="toggleReportOverlay">
+                  <div class="overlay-content p-4" @click.stop>
+                    <h3>{{ $t.report }}</h3>
+                    <label for="sentiment">{{ $t.sentiment }}</label>
+                    <select id="sentiment" v-model="selectedSentiment">
+                      <option value="positive">{{ $t.positive }}</option>
+                      <option value="negative">{{ $t.negative }}</option>
+                    </select>
+                    <label for="emotion">{{ $t.emotion }}</label>
+                    <select id="emotion" v-model="selectedEmotion">
+                      <option value="sadness">{{ $t.sadness }}</option>
+                      <option value="joy">{{ $t.joy }}</option>
+                      <option value="love">{{ $t.love }}</option>
+                      <option value="anger">{{ $t.anger }}</option>
+                      <option value="fear">{{ $t.fear }}</option>
+                      <option value="surprise">{{ $t.surprise }}</option>
+                    </select>
+                    <button @click="submitReport" class="btn btn-primary" :disabled="loadingReport || !selectedSentiment || !selectedEmotion">
+                      <span v-if="!loadingReport">{{ $t.report }}</span>
+                      <span v-if="loadingReport"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                  </div>
+                </div>
+                <!-- Result content -->
+                <h2 class="card-subtitle text-center mb-2">{{ $t.result }}</h2>
+                <p><strong>{{ $t.emotion }}:</strong> {{ $t[analysisResult.emotion] }}</p>
+                <p><strong>{{ $t.sentiment }}:</strong> {{ $t[analysisResult.sentiment] }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>© {{ currentYear }} Antonio Picone. Pathos.</p>
+        <p style="font-size: 10px;">{{ $t.made_in}}</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Dark mode toggle button -->
+  <button class="dark-mode-toggle" onclick="toggleDarkMode()" :title="$t.dark_toggle">
+    <i class="fas fa-adjust"></i>
+  </button>
+
+  <!-- Add debug icon -->
+  <button @click="toggleDebug" class="debug-btn" :title="$t.debug_console">
+    <i class="fas fa-bug"></i>
+  </button>
+
+  <!-- Debug console -->
+  <div ref="debugConsole" :class="{ 'debug-console': true, 'visible': debugVisible }" class="container fade-in">
+    <div class="row justify-content-center align-items-end">
+      <div class="col-lg-6">
+        <div class="debug-content">
+          <pre>{{ debugData }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Language Detect -->
+  <script src='https://github.com/wooorm/franc/releases/download/3.0.0/franc-min.js'></script>
+  <!-- Include country-flag-emoji-polyfill for flag consistency -->
+  <script type="module" defer>
+    import { polyfillCountryFlagEmojis } from "https://cdn.skypack.dev/country-flag-emoji-polyfill";
+    polyfillCountryFlagEmojis();
+  </script>
+  <!-- Include Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <!-- Include Vue I18n -->
+  <script src="https://cdn.jsdelivr.net/npm/vue-i18n@9.11.0/dist/vue-i18n.global.min.prod.js"></script>
+  <!-- Include Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Include Font Awesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+
+  <script>
+
+    // Define language files
+    const messages = {
+      en: {
+        emotion_detection: 'Emotion Detection',
+        emotion: "Emotion",
+        sentiment: "Sentiment",
+        textarea_placeholder: 'Enter text here...',
+        analyze: 'Analyze',
+        chars_to_lang: 'chars to know the language',
+        chars_remaining: 'characters remaining',
+        loading: 'Loading...',
+        result: 'Result',
+        close: 'Close',
+        debug_console: 'Debug Console',
+        dark_toggle: 'Toggle Dark Mode',
+        ita: 'Italian',
+        eng: 'English',
+        por: 'Portuguese',
+        sadness: 'sadness',
+        joy: 'joy',
+        love: 'love',
+        anger: 'anger',
+        fear: 'fear',
+        surprise: 'surprise',
+        positive: 'positive',
+        negative: 'negative',
+        report: 'Report',
+        made_in: 'Proudly made in 🇮🇹 and 🇧🇷'
+      },
+      it: {
+        emotion_detection: 'Analisi delle emozioni',
+        emotion: "Emozione",
+        sentiment: "Sentimento",
+        textarea_placeholder: 'Inserisci qui il tuo testo...',
+        analyze: 'Analizza',
+        chars_to_lang: 'caratteri per la lingua',
+        chars_remaining: 'caratteri rimanenti',
+        loading: 'Caricamento...',
+        result: 'Risultato',
+        close: 'Chiudi',
+        debug_console: 'Console di debug',
+        dark_toggle: 'Attiva/Disattiva modalità notte',
+        ita: 'Italiano',
+        eng: 'Inglese',
+        por: 'Portoghese',
+        sadness: 'tristezza',
+        joy: 'gioia',
+        love: 'amore',
+        anger: 'rabbia',
+        fear: 'paura',
+        surprise: 'sorpresa',
+        positive: 'positivo',
+        negative: 'negativo',
+        report: 'Segnala',
+        made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷'
+      },
+      pt: {
+        emotion_detection: 'Análise das emoções',
+        emotion: "Emoção",
+        sentiment: "Sentimento",
+        textarea_placeholder: 'Digite seu texto aqui...',
+        analyze: 'Analisar',
+        chars_to_lang: 'caracteres para reconhecer o idioma',
+        chars_remaining: 'caracteres restantes',
+        loading: 'Carregando...',
+        result: 'Resultado',
+        close: 'Fechar',
+        debug_console: 'Console de debug',
+        dark_toggle: 'Alternar modo escuro',
+        ita: 'Italiano',
+        eng: 'Inglês',
+        por: 'Português',
+        sadness: 'tristeza',
+        joy: 'felicidade',
+        love: 'amor',
+        anger: 'raiva',
+        fear: 'medo',
+        surprise: 'surpresa',
+        positive: 'positivo',
+        negative: 'negativo',
+        report: 'Reportar',
+        made_in: 'Orgulhosamente feito na 🇮🇹 e no 🇧🇷'
+      },
+    };
+
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          textInput: '',
+          detectedLanguage: '',
+          analysisResult: null,
+          loading: false,
+          loadingReport: false,
+          charLimit: 500,
+          debugVisible: false, // Initially set to false to hide the debug console
+          debugConsole: null,
+          debugData: `${new Date().toLocaleString()}\t Ready\n`, // Initialize debugData with current time and 'Ready'
+          locale: this.locale,
+          errorMessage: '',
+          reportOverlayVisible: false,
+          selectedSentiment: '',
+          selectedEmotion: '',
+          currentYear: new Date().getFullYear()
+        };
+      },
+      created() {
+        // Detect browser's preferred language
+        const browserLanguage = navigator.language.substring(0, 2);
+        // Set the initial locale based on the browser's preferred language
+        const initialLocale = Object.keys(messages).includes(browserLanguage) ? browserLanguage : 'en';
+        // Set the initial locale for the Vue instance
+        this.locale = initialLocale;
+        document.documentElement.lang = this.locale;
+        // Apply dark mode preference when the page renders
+        applyDarkModePreference();
+      },
+      mounted() {
+        // Access the debug console element after it's mounted to the DOM
+        this.debugConsole = this.$refs.debugConsole;
+      },
+      methods: {
+        // Method to change language
+        switchLocale(locale) {
+          this.locale = locale;
+        },
+        async analyzeText() {
+          // Close analysis result if it's open
+          this.closeAnalysisResult();
+          try {
+            this.loading = true;
+            // Make a POST request to the API
+            const response = await axios.post('/api/emotion/', { text: this.textInput.trim(), probs: true }, {});
+            // Set analysis result based on API response
+            this.analysisResult = response.data;
+            // Append message to debug console
+            const currentTime = new Date().toLocaleString();
+            const debugMessage = `${currentTime}\t${JSON.stringify(this.analysisResult)}`;
+            this.debugData += debugMessage + '\n';
+            this.scrollDebugConsoleToBottom();
+          } catch (error) {
+            console.error('Error analyzing text:', error);
+            // Show error toast
+            this.showToast(error.message);
+          } finally {
+            this.loading = false;
+          }
+        },
+        updateCharCountAndDetectLanguage() {
+          this.updateCharCount();
+          this.detectLanguage();
+        },
+        updateCharCount() {
+          if (this.textInput.length > this.charLimit) {
+            this.textInput = this.textInput.slice(0, this.charLimit);
+          }
+        },
+        detectLanguage() {
+          var supportedLanguages = ["eng", "ita", "por"]
+          var languageCode = franc(this.textInput, { whitelist: supportedLanguages, minLength: 60 });
+          this.detectedLanguage = this.$t[languageCode]
+        },
+        closeAnalysisResult() {
+          this.analysisResult = null;
+        },
+        toggleDebug() {
+          // Update debug visibility
+          this.debugVisible = !this.debugVisible;
+        },
+        bannerBackgroundColor() {
+          if (this.analysisResult && this.analysisResult.sentiment === 'positive') {
+            return '#198754'; // Green for positive sentiment
+          } else {
+            return '#dc3545'; // Red for negative sentiment
+          }
+        },
+        clearErrorMessage() {
+          // Add a class to trigger the fade-out animation
+          const toastElement = document.getElementById('toastPlacement');
+          toastElement.classList.add('fade-out');
+
+          // Delay the removal of the 'fade-out' class
+          setTimeout(() => {
+            // Clear the error message
+            this.errorMessage = '';
+            // Remove the 'fade-out' class to prevent future fade-out animations
+            toastElement.classList.remove('fade-out');
+          }, 500); // Adjust the timeout to match the duration of the fade-out animation
+        },
+        showToast(message) {
+          // Check if there's already a toast being displayed
+          if (!this.errorMessage) {
+            // If not, set the error message
+            this.errorMessage = message;
+            // Automatically clear the error message after a timeout
+            setTimeout(() => {
+              this.clearErrorMessage();
+            }, 5000); // Adjust the timeout duration as needed (5000 milliseconds = 5 seconds)
+          }
+        },
+        appendDebugMessage(message) {
+          // Append debug message to debugData
+          this.debugData += message + '\n';
+          // Scroll debug console to bottom
+          this.scrollDebugConsoleToBottom();
+        },
+        // Method to scroll debug console to bottom
+        scrollDebugConsoleToBottom() {
+          const debugContent = document.querySelector('.debug-content');
+          // Ensure debugContent is available
+          if (debugContent) {
+            // Scroll debug content to bottom
+            debugContent.scrollTop = debugContent.scrollHeight;
+          }
+        },
+        submitReport() {
+          // Enable loading state
+          this.loadingReport = true;
+
+          // Prepare the data to be sent
+          const data = {
+            text: this.textInput.trim(),
+            sentiment: this.selectedSentiment,
+            emotion: this.selectedEmotion
+          };
+
+          // Make a POST request to the API endpoint
+          axios.post('/api/feedback/', data)
+            .then(response => {
+              // Handle success response if needed
+              console.log('Feedback submitted successfully:', response.data);
+            })
+            .catch(error => {
+              // Handle error response if needed
+              console.error('Error submitting feedback:', error);
+              this.showToast(`Feedback: ${error.message}`)
+            })
+            .finally(() => {
+              // Reset loading state
+              this.loadingReport = false;
+              // Reset selected values
+              this.selectedSentiment = '';
+              this.selectedEmotion = '';
+              // Hide overlay
+              this.reportOverlayVisible = false;
+            });
+        },
+        toggleReportOverlay() {
+          this.reportOverlayVisible = !this.reportOverlayVisible;
+        },
+      },
+      computed: {
+        // Computed property to access translations
+        $t() {
+          return messages[this.locale];
+        },
+        // Computed property to determine if both sentiment and emotion are selected
+        isReportButtonDisabled() {
+          return !this.selectedSentiment || !this.selectedEmotion;
+        },
+      }
+    });
+
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('dark-mode');
+      
+      // Save dark mode preference in localStorage
+      const isDarkMode = body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    // Function to apply dark mode based on the preference stored in localStorage
+    function applyDarkModePreference() {
+        let isDarkMode = localStorage.getItem('darkMode');
+        if (isDarkMode === null) {
+            // Check if the device prefers dark mode
+            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } else {
+            isDarkMode = isDarkMode === 'true';
+        }
+        const body = document.body;
+        if (isDarkMode) {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+        // Save dark mode preference in localStorage
+        localStorage.setItem('darkMode', isDarkMode);
+        this.isDarkMode = isDarkMode; // Update the Vue data property
+    }
+  </script>
+</body>
+</html>

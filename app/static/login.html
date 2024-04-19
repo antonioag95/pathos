@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <!-- Include Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Include Font Awesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Custom Styles */
+    [v-cloak] {
+      display: block;
+      padding: 50px 0;
+    }
+    @keyframes spinner {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    [v-cloak]:before {
+      content: "";
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      margin-top: -10px;
+      margin-left: -10px;
+      border-radius: 50%;
+      border: 4px solid #198754; /* Green border color */
+      border-top-color: #20c997; /* Lighter green for animation */
+      animation: spinner 0.6s linear infinite;
+      text-indent: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    [v-cloak]>* {
+        display: none;
+    }
+    body {
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      overflow: hidden; /* Prevent content from being scrollable */
+    }
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      overflow: hidden;
+      max-width: 400px;
+      width: 100%;
+      transition: transform 0.3s ease;
+    }
+    .form-control {
+      border-radius: 0.5rem;
+    }
+    .btn-primary {
+      background-color: #4CAF50; /* Green color */
+      border-color: #4CAF50; /* Matching border color */
+      color: #fff; /* Text color */
+    }
+    .btn-primary:hover {
+      background-color: #45a049; /* Darker Green */
+      border-color: #45a049; /* Darker Green */
+    }
+    .btn-primary:disabled {
+      background-color: #6c757d; /* Grey color */
+      border-color: #6c757d; /* Matching border color */
+      color: #fff; /* Text color */
+    }
+    .btn-primary:disabled:hover {
+      background-color: #6c757d; /* Grey color */
+      border-color: #6c757d; /* Matching border color */
+      color: #fff; /* Text color */
+    }
+    .card-header {
+      position: relative; /* Ensure proper stacking */
+      padding: 35px;
+      text-align: center;
+      color: #fff; /* Text color */
+      background-image: url('img/emotions-banner.jpg'); /* Specify background image */
+      background-size: cover; /* Cover the entire element with the background image */
+      background-position: center; /* Center the background image */
+    }
+    .card-header::before {
+      content: ''; /* Create a pseudo-element */
+      position: absolute; /* Position the overlay */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    }
+    .card-title {
+      position: relative; /* Ensure proper stacking */
+      z-index: 1; /* Place text above the overlay */
+    }
+    .card-body {
+      padding: 20px;
+      min-height: 150px; /* Adjust the height as needed */
+    }
+    .card-footer {
+      background-color: #f8f9fa;
+      text-align: center;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    .card {
+      --bs-card-border-width: initial;
+    }
+    .dark-mode-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      border: none;
+      background-color: transparent;
+      color: inherit;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    /* Footer styles */
+    .footer {
+      background-color: #f8f9fa; /* Match the background color of the body */
+      text-align: center; /* Align text to the center */
+      position: fixed; /* Position the footer at the bottom */
+      width: 100%; /* Ensure the footer spans the full width */
+      bottom: 0; /* Position the footer at the bottom of the viewport */
+      left: 0; /* Align the footer to the left */
+      font-size: 12px; /* Set smaller font size */
+      font-family: "Twemoji Country Flags", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important ;
+    }
+
+    .footer .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .footer p {
+      margin: 0;
+      padding: 0;
+    }
+
+    .footer-content {
+      margin-bottom: 5px; /* Adjust spacing between paragraphs */
+    }
+    .text-danger {
+      margin-top: 10px; /* Add some spacing */
+    }
+    /* Dark mode */
+    .dark-mode {
+      background-color: #212529;
+      color: #f8f9fa;
+    }
+    .dark-mode .card {
+      background-color: #343a40;
+      color: #adb5bd;
+    }
+    .dark-mode .btn-primary {
+      background-color: #20c997; /* Teal color */
+      border-color: #20c997; /* Matching border color */
+    }
+
+    .dark-mode .btn-primary:hover {
+      background-color: #198754; /* Darker Green */
+      border-color: #198754; /* Darker Green */
+    }
+
+    .dark-mode .btn-primary:disabled {
+      background-color: #6c757d; /* Dark mode background color */
+      border-color: #6c757d; /* Dark mode border color */
+      color: #212529; /* Dark mode text color */
+    }
+
+    .dark-mode .btn-primary:disabled:hover {
+      background-color: #6c757d; /* Dark mode hover background color */
+      border-color: #6c757d; /* Dark mode hover border color */
+      color: #212529; /* Dark mode hover text color */
+    }
+    .dark-mode .card-header {
+      background-color: #198754;
+    }
+    .dark-mode .footer {
+      background-color: #212529;
+      color: #adb5bd;
+      border-top: 1px solid #212529;
+    }
+    .dark-mode .form-control {
+      background-color: #495057;
+      color: #adb5bd;
+    }
+    .dark-mode .form-control::placeholder {
+      color: #6c757d; /* Adjust placeholder color to be more visible */
+    }
+    .dark-mode .card-footer {
+      background-color: #343a40; /* Darker background color */
+      color: #adb5bd; /* Lighter text color */
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container d-flex justify-content-center align-items-center" style="height: 100vh;" v-cloak>
+    <div class="card border-0">
+      <div class="card-header">
+        <h1 class="card-title mb-0">{{ $t.title }}</h1>
+      </div>
+      <div class="card-body">
+        <form @submit.prevent="login">
+          <div class="mb-3">
+            <label for="username" class="form-label">{{ $t.username }}</label>
+            <input type="text" class="form-control" id="username" :placeholder="$t.username_placeholher" v-model="username">
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">{{ $t.password }}</label>
+            <input type="password" class="form-control" id="password" :placeholder="$t.password_placeholher" v-model="password">
+          </div>
+          <!-- Error message element -->
+          <div v-if="errorMessage" class="alert alert-danger text-center">
+            <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+          </div>
+        </form>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary" :disabled="!isFormValid" @click="login">
+          <span v-if="!isLoading">{{ $t.login }}</span>
+          <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i></span>
+        </button>
+      </div>
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-content">
+            <p>© {{ currentYear }} Antonio Picone. Pathos.</p>
+          </div>
+          <div class="footer-content">
+            <p style="font-size: 10px;">{{ $t.made_in}}</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Dark mode toggle button -->
+    <button class="dark-mode-toggle" @click="toggleDarkMode" :title="$t.dark_toggle">
+      <i class="fas fa-adjust"></i>
+    </button>
+  </div>
+  
+  <!-- Include country-flag-emoji-polyfill for flag consistency -->
+  <script type="module" defer>
+    import { polyfillCountryFlagEmojis } from "https://cdn.skypack.dev/country-flag-emoji-polyfill";
+    polyfillCountryFlagEmojis();
+  </script>
+  <!-- Include Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <!-- Include Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+
+    // Define language files
+    const messages = {
+      en: {
+        title: 'Pathos',
+        username: 'Username',
+        username_placeholher: 'Enter your username or email',
+        password: 'Password',
+        password_placeholher: 'Enter your password',
+        login: 'Login',
+        wrong_password: 'Incorrect user or password',
+        dark_toggle: 'Toggle Dark Mode',
+        made_in: 'Proudly made in 🇮🇹 and 🇧🇷'
+      },
+      it: {
+        title: 'Pathos',
+        username: 'Username',
+        username_placeholher: 'Inserisci il tuo nome utente o email',
+        password: 'Password',
+        password_placeholher: 'Inserisci la tua password',
+        login: 'Entra',
+        wrong_password: 'Username o password errati',
+        dark_toggle: 'Attiva/Disattiva modalità notte',
+        made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷'
+      },
+      pt: {
+        title: 'Pathos',
+        username: 'Usuário',
+        username_placeholher: 'Digite seu usuário ou e-mail',
+        password: 'Senha',
+        password_placeholher: 'Digite sua senha',
+        login: 'Entrar',
+        wrong_password: 'Usuário ou senha incorreto',
+        dark_toggle: 'Alternar modo escuro',
+        made_in: 'Orgulhosamente feito na 🇮🇹 e no 🇧🇷'
+      }
+    }
+
+    let app = new Vue({
+      el: '#app',
+      data: {
+        username: '',
+        password: '',
+        errorMessage: '',
+        isLoading: false,
+        isDarkMode: false,
+        locale: this.locale,
+        currentYear: new Date().getFullYear()
+      },
+      created() {
+        // Detect browser's preferred language
+        const browserLanguage = navigator.language.substring(0, 2);
+        // Set the initial locale based on the browser's preferred language
+        const initialLocale = Object.keys(messages).includes(browserLanguage) ? browserLanguage : 'en';
+        // Set the initial locale for the Vue instance
+        this.locale = initialLocale;
+        document.documentElement.lang = this.locale;
+        // Apply dark mode preference when the page renders
+        applyDarkModePreference();
+      },
+      computed: {
+        isFormValid() {
+          return this.username.trim() !== '' && this.password.trim() !== '';
+        },
+        $t() {
+          return messages[this.locale];
+        },
+      },
+      mounted() {
+        // Check for dark mode in local storage
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        this.isDarkMode = darkMode;
+
+        // Add event listeners to input fields
+        document.getElementById('username').addEventListener('input', this.toggleLoginButton);
+        document.getElementById('password').addEventListener('input', this.toggleLoginButton);
+
+        // Listen for Enter key press
+        document.addEventListener('keydown', this.handleKeyPress);
+      },
+      beforeDestroy() {
+        // Remove event listener to avoid memory leaks
+        document.removeEventListener('keydown', this.handleKeyPress);
+      },
+      methods: {
+        switchLocale(locale) {
+          this.locale = locale;
+        },
+        handleKeyPress(event) {
+          if (event.key === 'Enter') {
+            if (this.isFormValid) {
+              this.login();
+            }
+          }
+        },
+        login() {
+          this.isLoading = true;
+          this.errorMessage = '';
+
+          const formData = new FormData();
+          formData.append('username', this.username);
+          formData.append('password', this.password);
+
+          axios.post('/token', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then(response => {
+            if (response.request.responseURL) {
+              window.location.href = response.request.responseURL; // Redirect to the URL provided in the response
+            } else {
+              // Handle other successful login scenarios
+            }
+          })
+          .catch(error => {
+            var error_message = error.response.data.message;
+            if (error_message.toLowerCase() == "incorrect user or password") {
+              this.errorMessage = this.$t.wrong_password
+            }
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+        },
+      }
+    });
+
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('dark-mode');
+      
+      // Save dark mode preference in localStorage
+      const isDarkMode = body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    // Function to apply dark mode based on the preference stored in localStorage
+    function applyDarkModePreference() {
+        let isDarkMode = localStorage.getItem('darkMode');
+        if (isDarkMode === null) {
+            // Check if the device prefers dark mode
+            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } else {
+            isDarkMode = isDarkMode === 'true';
+        }
+        const body = document.body;
+        if (isDarkMode) {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+        // Save dark mode preference in localStorage
+        localStorage.setItem('darkMode', isDarkMode);
+        this.isDarkMode = isDarkMode; // Update the Vue data property
+    }
+    
+  </script>
+</body>
+</html>

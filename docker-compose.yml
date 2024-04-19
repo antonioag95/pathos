@@ -1,0 +1,11 @@
+version: "3.8"
+name: pathos
+services:
+    pathos:
+        build: .
+        container_name: pathos
+        image: pathos
+        network: host
+        volumes:
+            - ./logs:/code/app/logs
+        restart: unless-stopped

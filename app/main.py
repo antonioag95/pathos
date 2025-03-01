@@ -51,7 +51,7 @@ class OAuth2PasswordCookie(OAuth2PasswordBearer):
         token = request.cookies.get(self._token_name)
         if not token:
             # If token is not found raise HTTPException
-            raise HTTPException(status_code=401, detail="Invalid access token")
+            raise HTTPException(status_code=401, detail={"message": "Invalid access token", "status": "invalid_token"})
         return token
         
 # FastAPI instance
@@ -92,16 +92,28 @@ model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
 @app.exception_handler(400)
 async def bad_request_exception_handler(request: Request, exc: HTTPException):
     logging.warning(f"{get_client_ip(request)} - {request.url.path} - {exc.detail}")
+    # Ensure detail is always a dict to avoid key errors
+    detail = exc.detail if isinstance(exc.detail, dict) else {"message": exc.detail}
     # Return a JSON response with a 400 status code and the detail message from the HTTPException.
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": exc.detail})
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=detail)
 
 # Custom exception handler for 401 errors
 # This function is responsible for handling HTTPException instances with a status code of 401.
 @app.exception_handler(401)
 async def not_authorized_exception_handler(request: Request, exc: HTTPException):
     logging.warning(f"{get_client_ip(request)} - {request.url.path} - {exc.detail}")
+    # Ensure detail is always a dict to avoid key errors
+    detail = exc.detail if isinstance(exc.detail, dict) else {"message": exc.detail}
     # Return a JSON response with a 401 status code and the detail message from the HTTPException.
-    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"message": exc.detail})
+    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=detail)
+
+@app.exception_handler(403)
+async def bad_request_exception_handler(request: Request, exc: HTTPException):
+    logging.warning(f"{get_client_ip(request)} - {request.url.path} - {exc.detail}")
+    # Ensure detail is always a dict to avoid key errors
+    detail = exc.detail if isinstance(exc.detail, dict) else {"message": exc.detail}
+    # Return a JSON response with a 403 status code and the detail message from the HTTPException.
+    return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=detail)
 
 # Custom exception handler for 404 errors
 # This function is responsible for handling HTTPException instances with a status code of 404.
@@ -125,14 +137,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token",
+            detail={"message": "Invalid access token", "status": "invalid_token"},
             headers={"WWW-Authenticate": "Bearer"},
         )
     user = auth.get_user(user=user)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token",
+            detail={"message": "Invalid access token", "status": "invalid_token"},
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
@@ -142,7 +154,7 @@ async def get_current_active_user(current_user: Annotated[User, Depends(get_curr
     Checks if user is active, allows for turning on and off of individual users.
     """
     if current_user.disabled:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"message": "Inactive user", "status": "inactive"})
     return current_user
 
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
@@ -152,7 +164,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     """
     user = auth.authenticate_user(form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect user or password")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"message": "Incorrect user or password", "status": "incorrect"})
     access_token = auth.create_access_token(
         data={"sub": user.email}
     )
@@ -350,14 +362,14 @@ async def signup_user(
     if auth.get_user_by_username(signup_data.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exists"
+            detail={"message": "Username already exists", "status": "username_exists"}
         )
     
     # Check if email already exists
     if auth.get_user(signup_data.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already exists"
+            detail={"message": "Email already exists", "status": "email_exists"}
         )
     
     try:

@@ -96,13 +96,24 @@ class Auth():
         Checks the user exists then authenticates using password.
         Returns User if authenticated successfully, otherwise returns None.
         """
-        user_dict = self.users_collection.find_one({"$or":[ {"username":user}, {"email":user}]})
+        user_dict = self.users_collection.find_one({"$or": [{"username": user}, {"email": user}]})
         if user_dict is None:
             return None
+
+        # Check if the account is disabled
+        if user_dict.get("disabled"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"message": "Inactive user", "status": "inactive"},
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
         if not self.verify_password(password, user_dict["hashed_password"]):
             return None
-        user = User(**user_dict)
-        return user
+
+        user_obj = User(**user_dict)
+        return user_obj
+
     
     def get_user(self, user: str):
         """

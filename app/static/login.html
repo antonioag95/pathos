@@ -3,429 +3,593 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <!-- Include Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Include Font Awesome for icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <title>Pathos - Login/Signup</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Custom Styles */
-    [v-cloak] {
-      display: block;
-      padding: 50px 0;
+    :root {
+      --primary-color: #4CAF50;
+      --primary-dark: #45a049;
+      --secondary-color: #20c997;
+      --dark-bg: #1a1f24;
+      --card-bg: #ffffff;
+      --card-dark-bg: #2a2f34;
+      --text-dark: #e0e0e0;
     }
-    @keyframes spinner {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-    [v-cloak]:before {
-      content: "";
-      box-sizing: border-box;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      margin-top: -10px;
-      margin-left: -10px;
-      border-radius: 50%;
-      border: 4px solid #198754; /* Green border color */
-      border-top-color: #20c997; /* Lighter green for animation */
-      animation: spinner 0.6s linear infinite;
-      text-indent: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    [v-cloak]>* {
-        display: none;
-    }
+
     body {
-      background-color: #f8f9fa;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
       margin: 0;
-      overflow: hidden;
+      padding-bottom: 60px;
+      transition: background 0.5s ease;
+      font-family: "Twemoji Country Flags", system-ui, sans-serif;
     }
+
     .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      overflow: hidden; /* Prevent content from being scrollable */
-    }
-    .card {
-      border: none;
-      border-radius: 1rem;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
-      overflow: hidden;
       max-width: 400px;
-      width: 100%;
-      transition: transform 0.3s ease;
+      padding: 20px;
+      position: relative;
     }
-    .form-control {
-      border-radius: 0.5rem;
+
+    .auth-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
-    .btn-primary {
-      background-color: #4CAF50; /* Green color */
-      border-color: #4CAF50; /* Matching border color */
-      color: #fff; /* Text color */
+
+    .auth-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     }
-    .btn-primary:hover {
-      background-color: #45a049; /* Darker Green */
-      border-color: #45a049; /* Darker Green */
-    }
-    .btn-primary:disabled {
-      background-color: #6c757d; /* Grey color */
-      border-color: #6c757d; /* Matching border color */
-      color: #fff; /* Text color */
-    }
-    .btn-primary:disabled:hover {
-      background-color: #6c757d; /* Grey color */
-      border-color: #6c757d; /* Matching border color */
-      color: #fff; /* Text color */
-    }
+
     .card-header {
-      position: relative; /* Ensure proper stacking */
-      padding: 35px;
+      background-image: url('img/emotions-banner.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 2rem;
+      position: relative;
+      color: white;
       text-align: center;
-      color: #fff; /* Text color */
-      background-image: url('img/emotions-banner.jpg'); /* Specify background image */
-      background-size: cover; /* Cover the entire element with the background image */
-      background-position: center; /* Center the background image */
     }
+
     .card-header::before {
-      content: ''; /* Create a pseudo-element */
-      position: absolute; /* Position the overlay */
-      top: 0;
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1;
+    }
+
+    .card-title {
+      position: relative;
+      z-index: 2;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-control {
+      border: none;
+      border-bottom: 2px solid #ddd;
+      border-radius: 0;
+      padding: 0.6rem 0;
+      background: transparent;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .form-control:focus,
+    .form-control:hover {
+      border-color: var(--primary-color);
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .form-control:-webkit-autofill,
+    .form-control:-webkit-autofill:hover,
+    .form-control:-webkit-autofill:focus,
+    .form-control:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px var(--card-bg) inset !important;
+      -webkit-text-fill-color: #666 !important;
+      background: transparent !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    .form-label {
+      position: absolute;
+      top: 0.6rem;
+      left: 0;
+      color: #666;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+
+    .form-control:focus + .form-label,
+    .form-control:not(:placeholder-shown) + .form-label {
+      top: -0.8rem;
+      font-size: 0.7rem;
+      color: var(--primary-color);
+    }
+
+    .btn-auth {
+      background: var(--primary-color);
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 20px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    .btn-auth:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .toggle-link {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .toggle-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .toggle-link a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-    }
-    .card-title {
-      position: relative; /* Ensure proper stacking */
-      z-index: 1; /* Place text above the overlay */
-    }
-    .card-body {
-      padding: 20px;
-      min-height: 150px; /* Adjust the height as needed */
-    }
-    .card-footer {
-      background-color: #f8f9fa;
+      background: transparent;
       text-align: center;
-      position: relative;
-      padding-bottom: 15px;
+      padding: 10px 0;
+      font-size: 12px;
+      color: #666;
+      z-index: 0;
     }
-    .card {
-      --bs-card-border-width: initial;
-    }
+
     .dark-mode-toggle {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      z-index: 9999;
       border: none;
-      background-color: transparent;
-      color: inherit;
-      font-size: 24px;
+      background: transparent;
+      font-size: 20px;
       cursor: pointer;
-    }
-    /* Footer styles */
-    .footer {
-      background-color: #f8f9fa; /* Match the background color of the body */
-      text-align: center; /* Align text to the center */
-      position: fixed; /* Position the footer at the bottom */
-      width: 100%; /* Ensure the footer spans the full width */
-      bottom: 0; /* Position the footer at the bottom of the viewport */
-      left: 0; /* Align the footer to the left */
-      font-size: 12px; /* Set smaller font size */
-      font-family: "Twemoji Country Flags", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important ;
+      color: #666;
+      z-index: 1;
     }
 
-    .footer .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .footer p {
-      margin: 0;
-      padding: 0;
-    }
-
-    .footer-content {
-      margin-bottom: 5px; /* Adjust spacing between paragraphs */
-    }
-    .text-danger {
-      margin-top: 10px; /* Add some spacing */
-    }
-    /* Dark mode */
+    /* Dark Mode */
     .dark-mode {
-      background-color: #212529;
-      color: #f8f9fa;
-    }
-    .dark-mode .card {
-      background-color: #343a40;
-      color: #adb5bd;
-    }
-    .dark-mode .btn-primary {
-      background-color: #20c997; /* Teal color */
-      border-color: #20c997; /* Matching border color */
+      background: linear-gradient(135deg, #1a1f24 0%, #2d3436 100%);
     }
 
-    .dark-mode .btn-primary:hover {
-      background-color: #198754; /* Darker Green */
-      border-color: #198754; /* Darker Green */
+    .dark-mode .auth-card {
+      background: var(--card-dark-bg);
+      color: var(--text-dark);
     }
 
-    .dark-mode .btn-primary:disabled {
-      background-color: #6c757d; /* Dark mode background color */
-      border-color: #6c757d; /* Dark mode border color */
-      color: #212529; /* Dark mode text color */
-    }
-
-    .dark-mode .btn-primary:disabled:hover {
-      background-color: #6c757d; /* Dark mode hover background color */
-      border-color: #6c757d; /* Dark mode hover border color */
-      color: #212529; /* Dark mode hover text color */
-    }
-    .dark-mode .card-header {
-      background-color: #198754;
-    }
-    .dark-mode .footer {
-      background-color: #212529;
-      color: #adb5bd;
-      border-top: 1px solid #212529;
-    }
     .dark-mode .form-control {
-      background-color: #495057;
-      color: #adb5bd;
+      border-color: #555;
+      color: var(--text-dark);
+      background: transparent;
     }
-    .dark-mode .form-control::placeholder {
-      color: #6c757d; /* Adjust placeholder color to be more visible */
+
+    .dark-mode .form-control:focus,
+    .dark-mode .form-control:hover {
+      border-color: var(--secondary-color);
+      background: transparent;
     }
-    .dark-mode .card-footer {
-      background-color: #343a40; /* Darker background color */
-      color: #adb5bd; /* Lighter text color */
+
+    .dark-mode .form-control:-webkit-autofill,
+    .dark-mode .form-control:-webkit-autofill:hover,
+    .dark-mode .form-control:-webkit-autofill:focus,
+    .dark-mode .form-control:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px var(--card-dark-bg) inset !important;
+      -webkit-text-fill-color: var(--text-dark) !important;
+      background: transparent !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Fix calendar icon visibility in dark mode */
+    .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.8;
+    }
+
+    .dark-mode .form-label {
+      color: #aaa;
+    }
+
+    .dark-mode .btn-auth {
+      background: var(--secondary-color);
+    }
+
+    .dark-mode .btn-auth:hover {
+      background: #198754;
+    }
+
+    .dark-mode .footer {
+      color: var(--text-dark);
+    }
+
+    .dark-mode .card-header::before {
+      background: rgba(0,0,0,0.6);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Custom top toast styling */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+    }
+    .central-toast {
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      background-color: var(--card-bg);
+      color: #333;
+      opacity: 0.98;
+    }
+    .dark-mode .central-toast {
+      background-color: var(--card-dark-bg);
+      color: var(--text-dark);
     }
   </style>
 </head>
 <body>
-  <div id="app" class="container d-flex justify-content-center align-items-center" style="height: 100vh;" v-cloak>
-    <div class="card border-0">
+  <div id="app" class="container">
+    <div class="auth-card">
       <div class="card-header">
-        <h1 class="card-title mb-0">{{ $t.title }}</h1>
+        <h1 class="card-title">{{ $t.title }}</h1>
       </div>
       <div class="card-body">
-        <form @submit.prevent="login">
-          <div class="mb-3">
+        <form v-show="isLogin" @submit.prevent="login" class="fade-in">
+          <div class="form-group">
+            <input type="text" class="form-control" id="username" v-model="username" placeholder=" ">
             <label for="username" class="form-label">{{ $t.username }}</label>
-            <input type="text" class="form-control" id="username" :placeholder="$t.username_placeholher" v-model="username">
           </div>
-          <div class="mb-3">
+          <div class="form-group">
+            <input type="password" class="form-control" id="password" v-model="password" placeholder=" ">
             <label for="password" class="form-label">{{ $t.password }}</label>
-            <input type="password" class="form-control" id="password" :placeholder="$t.password_placeholher" v-model="password">
           </div>
-          <!-- Error message element -->
-          <div v-if="errorMessage" class="alert alert-danger text-center">
-            <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+          <button type="submit" class="btn-auth" :disabled="!isLoginValid || isLoading">
+            <span v-if="!isLoading">{{ $t.login }}</span>
+            <span v-else class="spinner"></span>
+          </button>
+          <div class="toggle-link">
+            <a href="#" @click.prevent="toggleForm">{{ $t.signup_prompt }}</a>
+          </div>
+        </form>
+
+        <form v-show="!isLogin" @submit.prevent="signup" class="fade-in">
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" v-model="signupData.name" placeholder=" ">
+            <label for="name" class="form-label">{{ $t.name }}</label>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="surname" v-model="signupData.surname" placeholder=" ">
+            <label for="surname" class="form-label">{{ $t.surname }}</label>
+          </div>
+          <div class="form-group">
+            <input type="date" class="form-control" id="birthdate" v-model="signupData.birthdate" placeholder=" ">
+            <label for="birthdate" class="form-label">{{ $t.birthdate }}</label>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="signup-username" v-model="signupData.username" placeholder=" ">
+            <label for="signup-username" class="form-label">{{ $t.username }}</label>
+          </div>
+          <div class="form-group">
+            <input type="email" class="form-control" id="email" v-model="signupData.email" placeholder=" ">
+            <label for="email" class="form-label">{{ $t.email }}</label>
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control" id="signup-password" v-model="signupData.password" placeholder=" ">
+            <label for="signup-password" class="form-label">{{ $t.password }}</label>
+          </div>
+          <button type="submit" class="btn-auth" :disabled="!isSignupValid || isLoading">
+            <span v-if="!isLoading">{{ $t.signup }}</span>
+            <span v-else class="spinner"></span>
+          </button>
+          <div class="toggle-link">
+            <a href="#" @click.prevent="toggleForm">{{ $t.login_prompt }}</a>
           </div>
         </form>
       </div>
-      <div class="card-footer">
-        <button type="submit" class="btn btn-primary" :disabled="!isFormValid" @click="login">
-          <span v-if="!isLoading">{{ $t.login }}</span>
-          <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i></span>
-        </button>
-      </div>
-      <footer class="footer">
-        <div class="container">
-          <div class="footer-content">
-            <p>© {{ currentYear }} Antonio Picone. Pathos.</p>
-          </div>
-          <div class="footer-content">
-            <p style="font-size: 10px;">{{ $t.made_in}}</p>
-          </div>
-        </div>
-      </footer>
     </div>
 
-    <!-- Dark mode toggle button -->
+    <footer class="footer">
+      <div>
+        <p>© {{ currentYear }} Antonio Picone. Pathos.</p>
+        <p style="font-size: 10px;">{{ $t.made_in }}</p>
+      </div>
+    </footer>
+
     <button class="dark-mode-toggle" @click="toggleDarkMode" :title="$t.dark_toggle">
       <i class="fas fa-adjust"></i>
     </button>
+
+    <!-- Top Toast container for notifications -->
+    <div aria-live="polite" aria-atomic="true" class="toast-container">
+      <div class="toast fade central-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000" ref="toast">
+        <div class="toast-header" :class="{'bg-danger text-white': errorMessage, 'bg-success text-white': !errorMessage}">
+          <strong class="me-auto">{{ errorMessage ? 'Error' : 'Success' }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">{{ message }}</div>
+      </div>
+    </div>
   </div>
-  
-  <!-- Include country-flag-emoji-polyfill for flag consistency -->
+
   <script type="module" defer>
     import { polyfillCountryFlagEmojis } from "https://cdn.skypack.dev/country-flag-emoji-polyfill";
     polyfillCountryFlagEmojis();
   </script>
-  <!-- Include Vue.js -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <!-- Include Axios -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-
-    // Define language files
     const messages = {
       en: {
         title: 'Pathos',
         username: 'Username',
-        username_placeholher: 'Enter your username or email',
         password: 'Password',
-        password_placeholher: 'Enter your password',
         login: 'Login',
-        wrong_password: 'Incorrect user or password',
+        signup: 'Sign Up',
+        signup_prompt: 'Need an account? Sign up',
+        login_prompt: 'Already have an account? Login',
+        name: 'Name',
+        surname: 'Surname',
+        birthdate: 'Birthdate',
+        email: 'Email',
+        signup_success: 'Registration successful! Please wait for admin approval.',
+        signup_error: 'Registration failed',
+        made_in: 'Proudly made in 🇮🇹 and 🇧🇷',
         dark_toggle: 'Toggle Dark Mode',
-        made_in: 'Proudly made in 🇮🇹 and 🇧🇷'
+        // New error translations
+        error_invalid_token: "Invalid token provided.",
+        error_inactive: "Your account is not active. Please contact an administrator.",
+        error_incorrect: "Either username or password is incorrect.",
+        error_username_exists: "Username already exists.",
+        error_email_exists: "Email already exists."
       },
       it: {
         title: 'Pathos',
-        username: 'Username',
-        username_placeholher: 'Inserisci il tuo nome utente o email',
+        username: 'Nome utente',
         password: 'Password',
-        password_placeholher: 'Inserisci la tua password',
-        login: 'Entra',
-        wrong_password: 'Username o password errati',
+        login: 'Accedi',
+        signup: 'Registrati',
+        signup_prompt: 'Non hai un account? Registrati',
+        login_prompt: 'Hai già un account? Accedi',
+        name: 'Nome',
+        surname: 'Cognome',
+        birthdate: 'Data di nascita',
+        email: 'Email',
+        signup_success: 'Registrazione completata! Attendi l’approvazione dell’amministratore.',
+        signup_error: 'Registrazione fallita',
+        made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷',
         dark_toggle: 'Attiva/Disattiva modalità notte',
-        made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷'
+        // New error translations
+        error_invalid_token: "Token non valido.",
+        error_inactive: "Il tuo account non è attivo. Contatta l'amministratore.",
+        error_incorrect: "Nome utente o password errati.",
+        error_username_exists: "Nome utente già esistente.",
+        error_email_exists: "Email già esistente."
       },
       pt: {
         title: 'Pathos',
         username: 'Usuário',
-        username_placeholher: 'Digite seu usuário ou e-mail',
         password: 'Senha',
-        password_placeholher: 'Digite sua senha',
         login: 'Entrar',
-        wrong_password: 'Usuário ou senha incorreto',
+        signup: 'Cadastrar-se',
+        signup_prompt: 'Precisa de uma conta? Cadastre-se',
+        login_prompt: 'Já tem uma conta? Entre',
+        name: 'Nome',
+        surname: 'Sobrenome',
+        birthdate: 'Data de nascimento',
+        email: 'Email',
+        signup_success: 'Registro concluído com sucesso! Aguarde a aprovação do administrador.',
+        signup_error: 'Registro falhou',
+        made_in: 'Orgulhosamente feito em 🇮🇹 e 🇧🇷',
         dark_toggle: 'Alternar modo escuro',
-        made_in: 'Orgulhosamente feito na 🇮🇹 e no 🇧🇷'
+        // New error translations
+        error_invalid_token: "Token inválido.",
+        error_inactive: "Sua conta não está ativa. Por favor, contate o administrador.",
+        error_incorrect: "Usuário ou senha incorretos.",
+        error_username_exists: "Nome de usuário já existe.",
+        error_email_exists: "Email já existe."
       }
-    }
+    };
 
-    let app = new Vue({
+    new Vue({
       el: '#app',
       data: {
+        isLogin: true,
         username: '',
         password: '',
-        errorMessage: '',
+        signupData: {
+          name: '',
+          surname: '',
+          birthdate: '',
+          username: '',
+          email: '',
+          password: ''
+        },
         isLoading: false,
-        isDarkMode: false,
-        locale: this.locale,
-        currentYear: new Date().getFullYear()
+        message: '',
+        errorMessage: false,
+        locale: 'en',
+        currentYear: new Date().getFullYear(),
+        isDarkMode: false
       },
       created() {
-        // Detect browser's preferred language
         const browserLanguage = navigator.language.substring(0, 2);
-        // Set the initial locale based on the browser's preferred language
-        const initialLocale = Object.keys(messages).includes(browserLanguage) ? browserLanguage : 'en';
-        // Set the initial locale for the Vue instance
-        this.locale = initialLocale;
+        this.locale = Object.keys(messages).includes(browserLanguage) ? browserLanguage : 'en';
         document.documentElement.lang = this.locale;
-        // Apply dark mode preference when the page renders
-        applyDarkModePreference();
+        this.applyDarkModePreference();
       },
       computed: {
-        isFormValid() {
-          return this.username.trim() !== '' && this.password.trim() !== '';
+        isLoginValid() {
+          return this.username.trim() && this.password.trim();
+        },
+        isSignupValid() {
+          return Object.values(this.signupData).every(val => val.trim());
         },
         $t() {
           return messages[this.locale];
-        },
-      },
-      mounted() {
-        // Check for dark mode in local storage
-        const darkMode = localStorage.getItem('darkMode') === 'true';
-        this.isDarkMode = darkMode;
-
-        // Add event listeners to input fields
-        document.getElementById('username').addEventListener('input', this.toggleLoginButton);
-        document.getElementById('password').addEventListener('input', this.toggleLoginButton);
-
-        // Listen for Enter key press
-        document.addEventListener('keydown', this.handleKeyPress);
-      },
-      beforeDestroy() {
-        // Remove event listener to avoid memory leaks
-        document.removeEventListener('keydown', this.handleKeyPress);
+        }
       },
       methods: {
-        switchLocale(locale) {
-          this.locale = locale;
+        toggleForm() {
+          this.isLogin = !this.isLogin;
+          this.message = '';
+          this.errorMessage = false;
         },
-        handleKeyPress(event) {
-          if (event.key === 'Enter') {
-            if (this.isFormValid) {
-              this.login();
+        async login() {
+          this.isLoading = true;
+          this.message = '';
+          try {
+            const formData = new FormData();
+            formData.append('username', this.username);
+            formData.append('password', this.password);
+            const response = await axios.post('/token', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            window.location.href = response.request.responseURL;
+          } catch (error) {
+            let errorMsg = 'Login failed';
+            if (error.response && error.response.data) {
+              switch (error.response.data.status) {
+                case 'invalid_token':
+                  errorMsg = this.$t.error_invalid_token;
+                  break;
+                case 'inactive':
+                  errorMsg = this.$t.error_inactive;
+                  break;
+                case 'incorrect':
+                  errorMsg = this.$t.error_incorrect;
+                  break;
+                default:
+                  errorMsg = error.response.data.message || 'Login failed';
+              }
             }
+            this.showToast(errorMsg, true);
+          } finally {
+            this.isLoading = false;
           }
         },
-        login() {
+        async signup() {
           this.isLoading = true;
-          this.errorMessage = '';
-
-          const formData = new FormData();
-          formData.append('username', this.username);
-          formData.append('password', this.password);
-
-          axios.post('/token', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+          this.message = '';
+          try {
+            const response = await axios.post('/api/signup/', this.signupData);
+            this.showToast(this.$t.signup_success);
+            this.errorMessage = false;
+            this.signupData = { name: '', surname: '', birthdate: '', username: '', email: '', password: '' };
+          } catch (error) {
+            let errorMsg = this.$t.signup_error;
+            if (error.response && error.response.data) {
+              switch (error.response.data.status) {
+                case 'username_exists':
+                  errorMsg = this.$t.error_username_exists;
+                  break;
+                case 'email_exists':
+                  errorMsg = this.$t.error_email_exists;
+                  break;
+                case 'inactive':
+                  errorMsg = this.$t.error_inactive;
+                  break;
+                default:
+                  errorMsg = error.response.data.detail || this.$t.signup_error;
+              }
             }
-          })
-          .then(response => {
-            if (response.request.responseURL) {
-              window.location.href = response.request.responseURL; // Redirect to the URL provided in the response
-            } else {
-              // Handle other successful login scenarios
-            }
-          })
-          .catch(error => {
-            var error_message = error.response.data.message;
-            if (error_message.toLowerCase() == "incorrect user or password") {
-              this.errorMessage = this.$t.wrong_password
-            }
-          })
-          .finally(() => {
+            this.showToast(errorMsg, true);
+          } finally {
             this.isLoading = false;
-          });
+          }
         },
+        toggleDarkMode() {
+          this.isDarkMode = !this.isDarkMode;
+          document.body.classList.toggle('dark-mode');
+          localStorage.setItem('darkMode', this.isDarkMode);
+        },
+        applyDarkModePreference() {
+          let isDarkMode = localStorage.getItem('darkMode');
+          if (isDarkMode === null) {
+            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          } else {
+            isDarkMode = isDarkMode === 'true';
+          }
+          this.isDarkMode = isDarkMode;
+          if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+          }
+        },
+        showToast(msg, isError = false) {
+          this.message = msg;
+          this.errorMessage = isError;
+          this.$nextTick(() => {
+            const toastEl = this.$refs.toast;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+          });
+        }
       }
     });
-
-    function toggleDarkMode() {
-      const body = document.body;
-      body.classList.toggle('dark-mode');
-      
-      // Save dark mode preference in localStorage
-      const isDarkMode = body.classList.contains('dark-mode');
-      localStorage.setItem('darkMode', isDarkMode);
-    }
-
-    // Function to apply dark mode based on the preference stored in localStorage
-    function applyDarkModePreference() {
-        let isDarkMode = localStorage.getItem('darkMode');
-        if (isDarkMode === null) {
-            // Check if the device prefers dark mode
-            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        } else {
-            isDarkMode = isDarkMode === 'true';
-        }
-        const body = document.body;
-        if (isDarkMode) {
-            body.classList.add('dark-mode');
-        } else {
-            body.classList.remove('dark-mode');
-        }
-        // Save dark mode preference in localStorage
-        localStorage.setItem('darkMode', isDarkMode);
-        this.isDarkMode = isDarkMode; // Update the Vue data property
-    }
-    
   </script>
+  <script type="module" defer>
+    import { polyfillCountryFlagEmojis } from "https://cdn.skypack.dev/country-flag-emoji-polyfill";
+    polyfillCountryFlagEmojis();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -2,12 +2,14 @@
 import logging
 import uvicorn
 import pathlib
+from datetime import date
 from fastapi import FastAPI, HTTPException, Depends, Request, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse, FileResponse, RedirectResponse
-from typing import Annotated
-from models import User, InputAPI, BaseResponse, FeedbackAPI
+from pydantic import BaseModel, EmailStr, Field
+from typing import Annotated, Optional
+from models import User, UserSignupAPI, InputAPI, BaseResponse, FeedbackAPI
 from auth import Auth
 from feedback import Feedback
 
@@ -34,12 +36,14 @@ class OAuth2PasswordCookie(OAuth2PasswordBearer):
 
     @property
     def token_name(self) -> str:
-        """Get the name of the token's cookie.
+        """
+        Get the name of the token's cookie.
         """
         return self._token_name
 
     async def __call__(self, request: Request) -> str:
-        """Extract and return a JWT from the request cookies.
+        """
+        Extract and return a JWT from the request cookies.
 
         Raises:
             HTTPException: 403 error if no token cookie is present.
@@ -326,7 +330,76 @@ async def read_root(request: Request, base_response: BaseResponse = Depends(get_
     except HTTPException as e:
         # If there's an HTTPException (e.g., invalid access token), redirect to the login page
         return RedirectResponse(url='/login', status_code=status.HTTP_303_SEE_OTHER)
-
+    
+@app.post("/api/signup/")
+async def signup_user(
+    signup_data: UserSignupAPI,
+    request: Request,
+    base_response: BaseResponse = Depends(get_base_response)
+):
+    """
+    Endpoint to register new users.
+    
+    The user will be created with disabled=True as per your requirement,
+    allowing the admin to manually approve the registration
+    
+    Returns:
+        JSON response with the result of the signup operation
+    """
+    # Check if username already exists
+    if auth.get_user_by_username(signup_data.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already exists"
+        )
+    
+    # Check if email already exists
+    if auth.get_user(signup_data.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already exists"
+        )
+    
+    try:
+        # Create a new user with disabled=True
+        new_user = auth.create_user(
+            name=signup_data.name,
+            surname=signup_data.surname,
+            birthdate=signup_data.birthdate,
+            username=signup_data.username,
+            email=signup_data.email,
+            password=signup_data.password,
+            disabled=True 
+        )
+        
+        # Calculate the response time
+        end_time = time.time()
+        response_time = int((end_time - request.state.start_time) * 1000)  # Convert to milliseconds
+        base_response.response_ms = response_time
+        
+        # Prepare the response
+        response = {
+            "message": "User registration successful",
+            "username": signup_data.username,
+            "email": signup_data.email
+        }
+        
+        # Update the response with base_response information
+        response["info"] = base_response.model_dump(exclude_unset=True)
+        
+        # Log the signup
+        logging.info(f"{get_client_ip(request)} - {request.url.path} - User registration: {signup_data.username}, {signup_data.email}")
+        
+        return response
+        
+    except Exception as e:
+        # Log any errors that occur during user creation
+        logging.error(f"{get_client_ip(request)} - {request.url.path} - Error during user registration: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred during user registration"
+        )
+    
 @app.post("/token")
 async def auth_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request, base_response: BaseResponse = Depends(get_base_response)):
     """

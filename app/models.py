@@ -1,15 +1,30 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from datetime import date
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
     """
     User class containing information on users, will be used to store users in a DB
     """
+    name: str = ""
+    surname: str = ""
+    birthdate: Optional[date] = None
     username: str
-    email: str = None
+    email: str
     hashed_password: str
     disabled: bool = False
+
+class UserSignupAPI(BaseModel):
+    """
+    Pydantic model for user signup requests.
+    """
+    name: str
+    surname: str
+    birthdate: date
+    username: str
+    email: EmailStr
+    password: str
 
 # Data model for input to the API
 class InputAPI(BaseModel):

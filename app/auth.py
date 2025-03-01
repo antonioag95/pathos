@@ -114,3 +114,73 @@ class Auth():
             user_dict = query
             return User(**user_dict)
         return None
+    
+    def get_password_hash(self, password: str):
+        """
+        Returns a hashed password using the pwd_context
+        
+        This is just an alias for hash_password to match the pattern in your code
+        """
+        return self.hash_password(password)
+
+    def get_user_by_username(self, username: str) -> Optional[User]:
+        """
+        Get a user by their username.
+        
+        Args:
+            username: The username to search for
+            
+        Returns:
+            User: The user object if found, None otherwise
+        """
+        user_data = self.users_collection.find_one({"username": username})
+        if user_data:
+            # Create a User object from the user data
+            return User(**user_data)
+        return None
+
+    def create_user(self, name: str, surname: str, birthdate: datetime, username: str, email: str, password: str, disabled: bool = False) -> User:
+        """
+        Create a new user in the database.
+        
+        Args:
+            name: User's first name
+            surname: User's last name
+            birthdate: User's date of birth
+            username: Unique username
+            email: User's email address (used as unique identifier)
+            password: Plain-text password that will be hashed
+            disabled: Whether the user account is disabled
+            
+        Returns:
+            User: The newly created user object
+        """
+        # Hash the password
+        hashed_password = self.hash_password(password)
+        
+        # Create a user document
+        user_data = {
+            "name": name,
+            "surname": surname,
+            "birthdate": birthdate.isoformat(),  # Store date as string in ISO format
+            "username": username,
+            "email": email,
+            "hashed_password": hashed_password,
+            "disabled": disabled
+        }
+        
+        # Insert into the database
+        result = self.users_collection.insert_one(user_data)
+        
+        # Create and return a User object
+        user = User(
+            name=name,
+            surname=surname,
+            birthdate=birthdate,
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
+            disabled=disabled
+        )
+        
+        return user

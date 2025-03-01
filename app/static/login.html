@@ -530,8 +530,18 @@
         async signup() {
           this.isLoading = true;
           this.message = '';
+
+          // Trim all input values before sending
+          const trimmedData = {
+            name: this.signupData.name.trim(),
+            surname: this.signupData.surname.trim(),
+            birthdate: this.signupData.birthdate.trim(),
+            username: this.signupData.username.trim(),
+            email: this.signupData.email.trim(),
+            password: this.signupData.password
+          };
           try {
-            const response = await axios.post('/api/signup/', this.signupData);
+            const response = await axios.post('/api/signup/', trimmedData);
             this.showToast(this.$t.signup_success);
             this.errorMessage = false;
             this.signupData = { name: '', surname: '', birthdate: '', username: '', email: '', password: '' };

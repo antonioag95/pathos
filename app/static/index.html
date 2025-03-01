@@ -487,7 +487,7 @@
           <div class="card-body d-flex flex-column justify-content-center align-items-center position-relative" :class="{ 'loading-overlay': loading }">
             <h1 class="card-title text-center mb-4">{{ $t.emotion_detection }}</h1>
             <div class="text-container">
-              <textarea class="form-control mb-3" v-model="textInput" :placeholder="$t.textarea_placeholder" @input="updateCharCountAndDetectLanguage"></textarea>
+              <textarea class="form-control mb-3" v-model="textInput" :placeholder="$t.textarea_placeholder" @input="updateCharCountAndDetectLanguage" @keydown="handleKeyPress"></textarea>
               <div class="char-count">{{ charLimit - textInput.trim().length }} {{ $t.chars_remaining }}</div>
               <!-- New element for displaying language code -->
               <div class="language-code">{{ textInput.trim().length < 60 ? `${60 - textInput.trim().length} ${$t.chars_to_lang}` : `${detectedLanguage}` }}</div>
@@ -502,7 +502,7 @@
               </div>
             </transition>
             <div v-if="analysisResult" class="mt-3 position-relative fade-in">
-              <div class="banner" :style="{ backgroundColor: analysisResult.sentiment === 'positive' ? '#198754' : '#dc3545' }"></div>
+              <div class="banner" :style="{ backgroundColor: analysisResult?.sentiment === 'positive' ? '#198754' : analysisResult?.sentiment === 'neutral' ? '#6c757d' : '#dc3545' }"></div>
               <div class="analysis-result">
                 <!-- Close button -->
                 <button @click="closeAnalysisResult" class="close-btn">&times;</button>
@@ -517,6 +517,7 @@
                     <label for="sentiment">{{ $t.sentiment }}</label>
                     <select id="sentiment" v-model="selectedSentiment">
                       <option value="positive">{{ $t.positive }}</option>
+                      <option value="neutral">{{ $t.neutral }}</option>
                       <option value="negative">{{ $t.negative }}</option>
                     </select>
                     <label for="emotion">{{ $t.emotion }}</label>
@@ -617,6 +618,7 @@
         fear: 'fear',
         surprise: 'surprise',
         positive: 'positive',
+        neutral: 'neutral',
         negative: 'negative',
         report: 'Report',
         made_in: 'Proudly made in 🇮🇹 and 🇧🇷'
@@ -644,6 +646,7 @@
         fear: 'paura',
         surprise: 'sorpresa',
         positive: 'positivo',
+        neutral: 'neutro',
         negative: 'negativo',
         report: 'Segnala',
         made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷'
@@ -671,6 +674,7 @@
         fear: 'medo',
         surprise: 'surpresa',
         positive: 'positivo',
+        neutral: 'neutro',
         negative: 'negativo',
         report: 'Reportar',
         made_in: 'Orgulhosamente feito na 🇮🇹 e no 🇧🇷'
@@ -718,6 +722,19 @@
         switchLocale(locale) {
           this.locale = locale;
         },
+        handleKeyPress(event) {
+          // Check if the button is not disabled (text length > 15)
+          if (this.textInput.length > 15) {
+            // For mobile (Enter key) or desktop (Ctrl+Enter)
+            if (event.key === 'Enter' && (event.ctrlKey || this.isMobileDevice())) {
+              this.analyzeText();
+              event.preventDefault(); // Prevent default behavior (new line in textarea)
+            }
+          }
+        },
+        isMobileDevice() {
+          return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        },
         async analyzeText() {
           // Close analysis result if it's open
           this.closeAnalysisResult();
@@ -764,8 +781,12 @@
         bannerBackgroundColor() {
           if (this.analysisResult && this.analysisResult.sentiment === 'positive') {
             return '#198754'; // Green for positive sentiment
-          } else {
+          } 
+          else if (this.analysisResult && this.analysisResult.sentiment === 'negative') {
             return '#dc3545'; // Red for negative sentiment
+          }
+          else {
+            return '#6c757d'; // Grey for neutral sentiment
           }
         },
         clearErrorMessage() {

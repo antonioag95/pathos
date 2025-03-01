@@ -24,7 +24,8 @@ from transformers import BertForSequenceClassification, BertConfig, BertTokenize
 logging.info('Pathos is starting up')
 
 class OAuth2PasswordCookie(OAuth2PasswordBearer):
-    """OAuth2 password flow with token in a httpOnly cookie.
+    """
+    OAuth2 password flow with token in a httpOnly cookie.
     """
 
     def __init__(self, *args, token_name: str = None, **kwargs):
@@ -370,45 +371,44 @@ async def create_item(input: InputAPI, request: Request, current_user: Annotated
     # Get input text and whether to return probabilities
     text = input.text.strip()
     return_probabilities = input.probs
-
-    # Predict emotion probabilities
+    
     emotion_probabilities = predict_emotion(text)
-
     # Convert probabilities to predicted label
     predicted_label = max(emotion_probabilities, key=emotion_probabilities.get)
-
     # Infer the sentiment from the emotion
     infered_sentiment = infer_sentiment(predicted_label)
-
+        
     # Prepare dictionary to return
-    response = {"text": text, "emotion": predicted_label, "sentiment": infered_sentiment}
-
+    response = {
+        "text": text,
+        "emotion": predicted_label,
+        "sentiment": infered_sentiment,
+        "source": "pathos"
+    }
     # If requested, include probabilities in the response
     if return_probabilities:
         response["probabilities"] = emotion_probabilities
-
+    
     # Calculate the response time
     end_time = time.time()
     response_time = int((end_time - request.state.start_time) * 1000)  # Convert to milliseconds
     base_response.response_ms = response_time
-
+    
     # Add the logged user info
     base_response.username = current_user.username
     base_response.email = current_user.email
-
-    # Assigning model name to base_response object
+    
+    # Assigning model information to base_response object
     base_response.model = get_model_name(model_path)
-
-    # Assigning inference device information to base_response object
     base_response.device = str(device)
-
+    
     # Update the response dictionary with the values from the base response under 'info'
     response["info"] = base_response.model_dump(exclude_unset=True)
-
+    
     # Log the results
     logging.info(f"{get_client_ip(request)} - {request.url.path} - {str(response)}")
-
-    # Return the dictionary containing text, predicted emotion, response time, Epoch time, and client's IP address
+    
+    # Return the dictionary
     return response
 
 @app.post("/api/feedback/")

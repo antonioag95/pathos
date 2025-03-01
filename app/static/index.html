@@ -2,615 +2,777 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Analysis App</title>
-  <!-- Include Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Include Font Awesome for icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Pathos - Emotion Analysis</title>
+  <link rel="icon" type="image/png" href="/img/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="/img/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Pathos" />
+  <link rel="manifest" href="/img/favicon/site.webmanifest" />
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Custom Styles */
-    [v-cloak] {
-      display: block;
-      padding: 50px 0;
-    }
-    @keyframes spinner {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-    [v-cloak]:before {
-      content: "";
-      box-sizing: border-box;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      margin-top: -10px;
-      margin-left: -10px;
-      border-radius: 50%;
-      border: 4px solid #198754; /* Green border color */
-      border-top-color: #20c997; /* Lighter green for animation */
-      animation: spinner 0.6s linear infinite;
-      text-indent: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    [v-cloak]>* {
-        display: none;
-    }
-    body {
-      background-color: #f8f9fa;
-      position: relative; /* Ensure relative positioning for footer */
-      min-height: 100vh; /* Ensure full height of viewport */
-    }
-    .card {
-      border: none;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-      position: relative;
-      margin-top: 40px; /* Adjust margin as needed */
-      height: 320px; /* Adjust height as needed */
-    }
-    textarea {
-      resize: none;
-    }
-    .btn-primary {
-      background-color: #4CAF50; /* Green */
-      border-color: #4CAF50; /* Green */
-    }
-    .btn-primary:hover {
-      background-color: #45a049; /* Darker Green */
-      border-color: #45a049; /* Darker Green */
-    }
-    .spinner-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .spinner-border {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      margin-top: -12px; /* Half of the spinner's height */
-      margin-left: -12px; /* Half of the spinner's width */
-    }
-    .char-count {
-      font-size: 12px;
-      color: #6c757d;
-      position: absolute;
-      bottom: -10px; /* Adjust position as needed */
-      right: 0; /* Adjust position as needed */
-      z-index: 1; /* Ensure it's above the textarea */
-    }
-    .form-control {
-      height: 150px; /* Set a fixed height */
-      border-radius: 0.5rem;
-      background-color: #fff; /* White background */
-    }
-    .text-container {
-      position: relative;
-      width: 100%;
-      margin-bottom: 20px; /* Increase margin as needed */
-    }
-    .btn-primary:disabled {
-      background-color: #6c757d; /* Light mode background color */
-      border-color: #6c757d; /* Light mode border color */
-      color: #fff; /* Light mode text color */
+    :root {
+      --primary-color: #4CAF50;
+      --primary-dark: #45a049;
+      --secondary-color: #20c997;
+      --dark-bg: #1a1f24;
+      --card-bg: #ffffff;
+      --card-dark-bg: #2a2f34;
+      --text-dark: #e0e0e0;
+      --positive-color: #198754;
+      --neutral-color: #6c757d;
+      --negative-color: #dc3545;
     }
 
-    .btn-primary:disabled:hover {
-      background-color: #6c757d; /* Light mode hover background color */
-      border-color: #6c757d; /* Light mode hover border color */
-      color: #fff; /* Light mode hover text color */
+    /* v-cloak to prevent flicker */
+    [v-cloak] {
+      display: none;
     }
-    .banner {
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      width: 100%;
-      height: 50px; /* Adjust height as needed */
-      background-color: #198754; /* Darker Green */
-      border: none; /* Remove border */
-      border-radius: 1rem; /* Match border-radius of the card */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* Match box-shadow of the card */
-      z-index: -1;
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      /* Ensure background covers the entire viewport, including safe areas on iOS */
+      min-height: 100vh;
+      min-height: -webkit-fill-available; /* Fix for iOS Safari */
     }
-    .alert-container {
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      min-height: -webkit-fill-available; /* Fix for iOS Safari */
+      transition: background 0.5s ease;
+      font-family: "Twemoji Country Flags", system-ui, sans-serif;
+      /* Extend background to safe areas on iOS */
+      background-attachment: fixed; /* Prevent background from scrolling */
+      background-size: cover; /* Ensure gradient covers entire viewport */
+      width: 100vw; /* Force width to cover viewport */
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
+    .container {
+      max-width: 900px;
+      width: 90vw;
+      padding: 20px 20px 70px; /* Adjusted for footer */
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       position: relative;
+    }
+
+    .overlay-open .container,
+    .overlay-open .emotion-card {
+      pointer-events: none;
+    }
+
+    .emotion-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      overflow-y: auto; /* Enable scrolling inside card */
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .emotion-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-header {
+      background-image: url('img/emotions-banner.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 2rem;
+      position: relative;
+      color: white;
+      text-align: center;
+    }
+
+    .card-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
       z-index: 1;
     }
-    .analysis-result {
-      background-color: #f8f9fa;
-      border: 1px solid #ced4da;
-      border-radius: 0.25rem;
+
+    .card-title {
+      position: relative;
+      z-index: 2;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 2rem;
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .form-control {
+      border: 1px solid #ddd;
+      border-radius: 10px;
       padding: 1rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-      margin-top: 20px;
+      background: transparent;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      resize: none;
+      height: 150px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
+
+    .form-control:focus,
+    .form-control:hover {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+      transform: scale(1.01);
+      background: transparent;
+    }
+
+    .form-control::placeholder {
+      color: #666;
+      opacity: 0.8;
+    }
+
+    .dark-mode .form-control::placeholder {
+      color: #bbb;
+      opacity: 1;
+    }
+
+    .info-text {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .btn-analyze {
+      background: var(--primary-color);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 20px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-size: 1rem;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      color: white !important;
+    }
+
+    .btn-analyze:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-analyze:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .dark-mode .btn-analyze {
+      background: var(--secondary-color);
+      color: white !important;
+    }
+
+    .dark-mode .btn-analyze:hover {
+      background: #198754;
+    }
+
+    .analysis-result {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 1.5rem 2.5rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+      border-left: 4px solid;
+      border-left-color: var(--positive-color);
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    .analysis-result.positive {
+      border-left-color: var(--positive-color);
+    }
+
+    .analysis-result.neutral {
+      border-left-color: var(--neutral-color);
+    }
+
+    .analysis-result.negative {
+      border-left-color: var(--negative-color);
+    }
+
     .analysis-result h2 {
-      margin-top: 0;
-      color: #198754;
-    }
-    .analysis-result p {
+      font-size: 1.3rem;
+      color: var(--primary-color);
       margin-bottom: 0.5rem;
-      color: #6c757d;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
+
+    .analysis-result p {
+      margin: 0.3rem 0;
+      font-size: 1rem;
+    }
+
     .close-btn {
       position: absolute;
       top: 10px;
-      right: -3px;
-      font-size: 20px; /* Adjust font size */
-      padding: 5px 8px; /* Adjust padding */
+      right: 10px;
+      font-size: 18px;
       border: none;
-      background-color: transparent;
-      color: #6c757d;
+      background: transparent;
+      color: #666;
       cursor: pointer;
+      transition: color 0.3s ease;
+      z-index: 2;
     }
+
     .close-btn:hover {
-      color: #000;
-    }
-    .language-code {
-      font-size: 12px;
-      color: #6c757d;
-      position: absolute;
-      bottom: -10px; /* Adjust position as needed */
-      left: 0; /* Adjust position as needed */
-      z-index: 1; /* Ensure it's above the textarea */
-    }
-    .loading-overlay::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1000; /* Ensure it's above other content */
-      background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white for light theme */
-    }
-    .card-body.loading-overlay::before {
-      background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white for light theme */
-    }
-    /* Debug button style */
-    .debug-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 10000; /* Ensure debug button is above console */
-      border: none;
-      background-color: transparent;
-      color: inherit;
-      font-size: 24px;
-      cursor: pointer;
+      color: #333;
     }
 
-    /* Debug console style */
-    .debug-console {
-      display: none; /* Initially hide the console */
-      position: fixed;
-      bottom: 65px; /* Adjust as needed */
-      left: 0;
-      right: 0;
-      z-index: 9999;
-    }
-
-    .debug-content {
-      overflow-y: auto; /* Enable vertical scrolling */
-      background-color: #1e1e1e;
-      border: 2px solid #4caf50;
-      border-radius: 8px;
-      padding: 10px;
-      font-family: 'Courier New', Courier, monospace;
-      color: #4caf50;
-      height: 100px; /* Set a fixed height */
-    }
-    .debug-content pre {
-      overflow: initial; /* Disable horizontal scrollbar for pre elements within debug-content */
-    }
-    /* Scrollbar style for both horizontal and vertical */
-    .debug-content::-webkit-scrollbar {
-      width: 6px; /* Set width to match custom scrollbar */
-      height: 6px; /* Set height to match custom scrollbar */
-    }
-
-    .debug-content::-webkit-scrollbar-track {
-      background: transparent; /* Set to transparent */
-    }
-
-    .debug-content::-webkit-scrollbar-thumb {
-      background-color: #4caf50; /* Match color of custom scrollbar thumb */
-      border-radius: 3px; /* Adjust border radius if necessary */
-    }
-
-    .debug-content::-webkit-scrollbar-thumb:hover {
-      background-color: #3d8e41; /* Match color of custom scrollbar thumb on hover */
-    }
-
-    pre::-webkit-scrollbar {
-      width: 6px; /* Set width to match custom scrollbar */
-      height: 6px; /* Set height to match custom scrollbar */
-    }
-
-    pre::-webkit-scrollbar-track {
-      background: transparent; /* Set to transparent */
-    }
-
-    pre::-webkit-scrollbar-thumb {
-      background-color: #4caf50; /* Match color of custom scrollbar thumb */
-      border-radius: 3px; /* Adjust border radius if necessary */
-    }
-
-    pre::-webkit-scrollbar-thumb:hover {
-      background-color: #3d8e41; /* Match color of custom scrollbar thumb on hover */
-    }
-    .visible {
-      display: block !important;
-    }
-    .toast {
-      width: auto; /* Adjust width automatically based on content */
-    }
-    .fade-in {
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-    .fade-out {
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out; /* Adjust the duration and easing as needed */
-    }
     .report-btn {
-      position: absolute;
-      top: 10px;
-      left: 0px;
-      font-size: 12px;
-      padding: 13px 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       border: none;
-      background-color: transparent;
-      color: #6c757d; /* Dark grey color */
+      background: transparent;
+      color: #666;
       cursor: pointer;
+      transition: color 0.3s ease;
+      font-size: 18px;
+      margin-top: 1rem;
     }
+
+    .report-btn:hover {
+      color: #333;
+    }
+
     .report-overlay {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999; /* Ensure it's above other content */
+      z-index: 9999;
+      overflow-y: auto;
+      /* Extend to safe areas on iOS */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     .overlay-content {
-      background-color: #fff; /* White background */
-      padding: 40px; /* Increase padding as needed */
+      background: var(--card-bg);
+      padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
-      max-width: 100%; /* Ensure the overlay is as wide as the card */
-      max-height: 320px; /* Match the height of the card */
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      max-width: 90%;
       width: 300px;
-      overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
     }
 
     .overlay-content h3 {
-      margin-top: 0;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
     }
 
-    .overlay-content label {
-      display: block;
-      margin-bottom: 5px;
+    .dark-mode .overlay-content h3 {
+      color: var(--text-dark);
     }
 
     .overlay-content select {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
-      border: 1px solid #ced4da; /* Add a border to the select */
-      border-radius: 0.25rem; /* Add border radius */
-      background-color: #fff; /* White background */
-      color: #212529; /* Dark text color */
-    }
-
-    .overlay-content option {
-      background-color: #fff; /* White background for options */
-      color: #212529; /* Dark text color for options */
-    }
-
-    .overlay-content button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      color: #fff; /* White text color */
-      border: none;
+      border: 1px solid #ddd;
       border-radius: 5px;
-      cursor: pointer;
+      font-size: 0.9rem;
+      background: var(--card-bg);
+      color: #333;
     }
-    /* Footer styles */
+
+    .dark-mode .overlay-content select {
+      background: var(--card-dark-bg);
+      color: var(--text-dark);
+      border-color: #555;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .footer {
-      background-color: #f8f9fa; /* Match the background color of the body */
-      padding: 10px 0; /* Add some padding for better spacing */
-      text-align: center; /* Align text to the center */
-      position: fixed; /* Position the footer at the bottom */
-      width: 100%; /* Ensure the footer spans the full width */
-      bottom: 0; /* Position the footer at the bottom of the viewport */
-      left: 0; /* Align the footer to the left */
-      font-size: 12px; /* Set smaller font size */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: inherit;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 12px;
+      color: #666;
+      z-index: 0;
+      height: 50px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      font-family: "Twemoji Country Flags", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important ;
+      justify-content: center;
+      gap: 2px;
+      /* Extend to safe areas on iOS */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
+
     .footer p {
       margin: 0;
-      padding: 0;
+      line-height: 1.2;
     }
+
+    .footer p:last-child {
+      font-size: 10px;
+    }
+
+    .dark-mode-toggle, .logout-btn {
+      position: fixed;
+      bottom: 25px;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      cursor: pointer;
+      color: #666;
+      z-index: 1;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode-toggle {
+      right: 20px;
+      /* Adjust for safe area on iOS */
+      right: calc(20px + env(safe-area-inset-right));
+    }
+
+    .logout-btn {
+      left: 20px;
+      /* Adjust for safe area on iOS */
+      left: calc(20px + env(safe-area-inset-left));
+    }
+
+    .dark-mode-toggle:hover, .logout-btn:hover {
+      color: #333;
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+      background: linear-gradient(135deg, #1a1f24 0%, #2d3436 100%);
+      background-attachment: fixed; /* Prevent background from scrolling */
+      background-size: cover; /* Ensure gradient covers entire viewport */
+    }
+
+    .dark-mode .emotion-card,
+    .dark-mode .analysis-result,
+    .dark-mode .overlay-content {
+      background: var(--card-dark-bg);
+      color: var(--text-dark);
+    }
+
+    .dark-mode .form-control {
+      border-color: #555;
+      color: var(--text-dark);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .dark-mode .form-control:focus,
+    .dark-mode .form-control:hover {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 8px rgba(32, 201, 151, 0.3);
+    }
+
+    .dark-mode .info-text,
+    .dark-mode .close-btn,
+    .dark-mode .report-btn {
+      color: #aaa;
+    }
+
+    .dark-mode .footer {
+      color: var(--text-dark);
+    }
+
+    .dark-mode .card-header::before {
+      background: rgba(0,0,0,0.6);
+    }
+
+    .dark-mode .dark-mode-toggle,
+    .dark-mode .logout-btn {
+      color: #aaa;
+    }
+
+    .dark-mode .dark-mode-toggle:hover,
+    .dark-mode .logout-btn:hover {
+      color: #fff;
+    }
+
     .spinner-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      z-index: 1000;
     }
+
     .spinner-border {
-      color: #198754 !important; /* Set the color to match your palette */
-    }
-    /* Dark mode */
-    body.dark-mode {
-      background-color: #212529;
-      color: #f8f9fa;
-    }
-    .dark-mode .card {
-      background-color: #343a40;
-      color: #adb5bd;
-    }
-    .dark-mode .btn-primary {
-      background-color: #20c997; /* Teal */
-      border-color: #20c997; /* Teal */
-    }
-    .dark-mode .btn-primary:hover {
-      background-color: #198754; /* Darker Green */
-      border-color: #198754; /* Darker Green */
-    }
-    .dark-mode .char-count {
-      color: #adb5bd;
-    }
-    .dark-mode .form-control {
-      background-color: #495057; /* Darker grey */
-      color: #f8f9fa; /* Light grey */
-    }
-    .dark-mode ::placeholder {
-      color: #adb5bd; /* Light grey */
-    }
-    .dark-mode .analysis-result {
-      background-color: #343a40;
-      border-color: #495057;
-      color: #adb5bd;
-    }
-    .dark-mode .analysis-result h2 {
-      color: #20c997;
-    }
-    .dark-mode .analysis-result p {
-      color: #adb5bd;
-    }
-    .dark-mode .close-btn {
-      color: #adb5bd; /* Adjust color for dark mode */
-    }
-    .dark-mode .close-btn:hover {
-      color: #fff; /* Adjust color for dark mode on hover */
-    }
-    .dark-mode .language-code {
-      color: #adb5bd;
-    }
-    .dark-mode .card-body.loading-overlay::before {
-      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black for dark theme */
-    }
-    .dark-mode .footer {
-      background-color: #212529; /* Dark background color for dark mode */
-      color: #adb5bd; /* Text color for dark mode */
-    }
-    .dark-mode .btn-primary:disabled {
-      background-color: #6c757d; /* Dark mode background color */
-      border-color: #6c757d; /* Dark mode border color */
-      color: #212529; /* Dark mode text color */
+      color: var(--primary-color);
     }
 
-    .dark-mode .btn-primary:disabled:hover {
-      background-color: #6c757d; /* Dark mode hover background color */
-      border-color: #6c757d; /* Dark mode hover border color */
-      color: #212529; /* Dark mode hover text color */
-    }
-    /* Dark mode toggle button */
-    .dark-mode-toggle {
+    /* Toast Styling */
+    .toast-container {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      border: none;
-      background-color: transparent;
-      color: inherit;
-      font-size: 24px;
-      cursor: pointer;
-    }
-    .dark-mode .report-btn {
-      color: #adb5bd; /* Light grey color */
-    }
-    .overlay-content.dark-mode {
-      background-color: #343a40; /* Dark background color */
-      color: #adb5bd; /* Text color in dark mode */
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Shadow effect in dark mode */
-    }
-    .overlay-content.dark-mode button {
-      background-color: #20c997; /* Teal button color in dark mode */
-    }
-    .dark-mode .overlay-content {
-      background-color: #343a40; /* Dark background color */
-      color: #adb5bd; /* Text color in dark mode */
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Shadow effect in dark mode */
-    }
-    .dark-mode .overlay-content select {
-      background-color: #495057; /* Darker grey background */
-      color: #f8f9fa; /* Light text color */
-      border: none; /* Remove border */
-      border-radius: 0.25rem; /* Adjust border radius as needed */
-      padding: 8px; /* Adjust padding as needed */
+      top: 20px;
+      top: calc(20px + env(safe-area-inset-top)); /* Adjust for iOS safe area */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+      /* Extend to safe areas on iOS */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
 
-    .dark-mode .overlay-content option {
-      background-color: #343a40; /* Dark background color */
-      color: #adb5bd; /* Light text color */
+    .central-toast {
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      background: var(--card-bg);
+      color: #333;
+    }
+
+    .dark-mode .central-toast {
+      background: var(--card-dark-bg);
+      color: var(--text-dark);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 90%;
+        padding: 15px 15px 60px;
+      }
+
+      .card-header {
+        padding: 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .form-control {
+        height: 100px;
+        font-size: 0.85rem;
+        padding: 0.8rem;
+      }
+
+      .info-text {
+        font-size: 0.8rem;
+      }
+
+      .btn-analyze {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      .analysis-result {
+        padding: 1rem 2rem;
+      }
+
+      .analysis-result h2 {
+        font-size: 1rem;
+      }
+
+      .analysis-result p {
+        font-size: 0.85rem;
+      }
+
+      .report-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        margin-top: 0.5rem;
+      }
+
+      .overlay-content {
+        width: 90%;
+        padding: 15px;
+      }
+
+      .overlay-content h3 {
+        font-size: 1.2rem;
+      }
+
+      .dark-mode-toggle, .logout-btn {
+        font-size: 18px;
+        bottom: 25px;
+      }
+
+      .dark-mode-toggle {
+        right: 15px;
+        right: calc(15px + env(safe-area-inset-right));
+      }
+
+      .logout-btn {
+        left: 15px;
+        left: calc(15px + env(safe-area-inset-left));
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container {
+        max-width: 95%;
+        padding: 10px 10px 60px;
+      }
+
+      .form-control {
+        height: 80px;
+        font-size: 0.8rem;
+        padding: 0.6rem;
+      }
+
+      .info-text {
+        font-size: 0.75rem;
+      }
+
+      .btn-analyze {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      .analysis-result {
+        padding: 1rem 1.5rem;
+      }
+
+      .analysis-result h2 {
+        font-size: 0.9rem;
+      }
+
+      .analysis-result p {
+        font-size: 0.8rem;
+      }
+
+      .report-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        margin-top: 0.5rem;
+      }
+
+      .overlay-content {
+        padding: 10px;
+      }
+
+      .overlay-content h3 {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Landscape Adjustments */
+    @media (orientation: landscape) and (max-height: 500px) {
+      .container {
+        min-height: auto;
+        padding: 10px 10px 60px;
+      }
+
+      .emotion-card {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .form-control {
+        height: 100px;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+
+      .dark-mode-toggle, .logout-btn {
+        bottom: 15px;
+      }
+    }
+
+    /* iOS-specific Adjustments */
+    @supports (-webkit-touch-callout: none) {
+      html, body {
+        height: 100%;
+        min-height: -webkit-fill-available;
+      }
+
+      body {
+        min-height: -webkit-fill-available;
+        background-attachment: scroll; /* iOS Safari sometimes has issues with fixed */
+      }
+
+      .report-overlay {
+        height: 100%;
+        height: -webkit-fill-available;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="app" class="container-fluid" v-cloak>
-    <div class="toast-container position-absolute p-3 top-0 end-0" id="toastPlacement">
-      <div class="toast align-items-center text-white bg-danger border-0 fade-in" :class="{ 'show': errorMessage }" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-          <div class="toast-body">
-            {{ errorMessage }}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" @click="clearErrorMessage" aria-label="Close"></button>
+  <div id="app" v-cloak :class="{ 'overlay-open': reportOverlayVisible }">
+    <div class="container">
+      <div class="emotion-card">
+        <div class="card-header">
+          <h1 class="card-title">{{ $t.emotion_detection }}</h1>
         </div>
+        <div class="card-body">
+          <div class="form-group">
+            <textarea class="form-control" v-model="textInput" :placeholder="$t.textarea_placeholder" @input="updateCharCountAndDetectLanguage" @keydown="handleKeyPress"></textarea>
+            <div class="info-text">
+              <span class="language-code">{{ textInput.trim().length < 60 ? `${60 - textInput.trim().length} ${$t.chars_to_lang}` : `${detectedLanguage}` }}</span>
+              <span class="char-count">{{ charLimit - textInput.trim().length }} {{ $t.chars_remaining }}</span>
+            </div>
+          </div>
+          <button @click="analyzeText" class="btn-analyze" :disabled="textInput.length <= 15">{{ $t.analyze }}</button>
+          <div v-if="loading" class="spinner-container">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">{{ $t.loading }}</span>
+            </div>
+          </div>
+          <div v-if="analysisResult" class="analysis-result" :class="analysisResult.sentiment">
+            <button @click="closeAnalysisResult" class="close-btn">×</button>
+            <h2>
+              {{ $t.result }}
+              <span v-if="analysisResult.sentiment === 'positive'">😊</span>
+              <span v-if="analysisResult.sentiment === 'neutral'">😐</span>
+              <span v-if="analysisResult.sentiment === 'negative'">😢</span>
+            </h2>
+            <p><strong>{{ $t.emotion }}:</strong> {{ $t[analysisResult.emotion] }}</p>
+            <p><strong>{{ $t.sentiment }}:</strong> {{ $t[analysisResult.sentiment] }}</p>
+            <button @click="openReportOverlay" class="report-btn"><i class="fas fa-flag"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div>
+          <p>© {{ currentYear }} Antonio Picone. Pathos.</p>
+          <p>{{ $t.made_in }}</p>
+        </div>
+      </footer>
+
+      <button class="dark-mode-toggle" @click="toggleDarkMode" :title="$t.dark_toggle">
+        <i class="fas fa-adjust"></i>
+      </button>
+
+      <button class="logout-btn" @click="logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+
+    <div v-if="reportOverlayVisible" class="report-overlay" @click="closeReportOverlay">
+      <div class="overlay-content" @click.stop>
+        <h3>{{ $t.report }}</h3>
+        <label for="sentiment">{{ $t.sentiment }}</label>
+        <select id="sentiment" v-model="selectedSentiment">
+          <option value="positive">{{ $t.positive }}</option>
+          <option value="neutral">{{ $t.neutral }}</option>
+          <option value="negative">{{ $t.negative }}</option>
+        </select>
+        <label for="emotion">{{ $t.emotion }}</label>
+        <select id="emotion" v-model="selectedEmotion">
+          <option value="sadness">{{ $t.sadness }}</option>
+          <option value="joy">{{ $t.joy }}</option>
+          <option value="love">{{ $t.love }}</option>
+          <option value="anger">{{ $t.anger }}</option>
+          <option value="fear">{{ $t.fear }}</option>
+          <option value="surprise">{{ $t.surprise }}</option>
+        </select>
+        <button @click="submitReport" class="btn-analyze" :disabled="loadingReport || !selectedSentiment || !selectedEmotion">
+          <span v-if="!loadingReport">{{ $t.report }}</span>
+          <span v-else><i class="fas fa-spinner fa-spin"></i></span>
+        </button>
       </div>
     </div>
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-body d-flex flex-column justify-content-center align-items-center position-relative" :class="{ 'loading-overlay': loading }">
-            <h1 class="card-title text-center mb-4">{{ $t.emotion_detection }}</h1>
-            <div class="text-container">
-              <textarea class="form-control mb-3" v-model="textInput" :placeholder="$t.textarea_placeholder" @input="updateCharCountAndDetectLanguage" @keydown="handleKeyPress"></textarea>
-              <div class="char-count">{{ charLimit - textInput.trim().length }} {{ $t.chars_remaining }}</div>
-              <!-- New element for displaying language code -->
-              <div class="language-code">{{ textInput.trim().length < 60 ? `${60 - textInput.trim().length} ${$t.chars_to_lang}` : `${detectedLanguage}` }}</div>
-            </div>
-            <button @click="analyzeText" class="btn btn-primary btn-block mb-3" :disabled="textInput.length <= 15">{{ $t.analyze }}</button>
-            <transition name="fade">
-              <div v-if="loading" class="text-center spinner-container">
-                <div class="overlay"></div>
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">{{ $t.loading }}</span>
-                </div>
-              </div>
-            </transition>
-            <div v-if="analysisResult" class="mt-3 position-relative fade-in">
-              <div class="banner" :style="{ backgroundColor: analysisResult?.sentiment === 'positive' ? '#198754' : analysisResult?.sentiment === 'neutral' ? '#6c757d' : '#dc3545' }"></div>
-              <div class="analysis-result">
-                <!-- Close button -->
-                <button @click="closeAnalysisResult" class="close-btn">&times;</button>
-                <!-- Report button -->
-                <button @click="toggleReportOverlay" class="report-btn">
-                  <i class="fas fa-flag"></i>
-                </button>
-                <!-- Report overlay -->
-                <div class="report-overlay" v-if="reportOverlayVisible" @click="toggleReportOverlay">
-                  <div class="overlay-content p-4" @click.stop>
-                    <h3>{{ $t.report }}</h3>
-                    <label for="sentiment">{{ $t.sentiment }}</label>
-                    <select id="sentiment" v-model="selectedSentiment">
-                      <option value="positive">{{ $t.positive }}</option>
-                      <option value="neutral">{{ $t.neutral }}</option>
-                      <option value="negative">{{ $t.negative }}</option>
-                    </select>
-                    <label for="emotion">{{ $t.emotion }}</label>
-                    <select id="emotion" v-model="selectedEmotion">
-                      <option value="sadness">{{ $t.sadness }}</option>
-                      <option value="joy">{{ $t.joy }}</option>
-                      <option value="love">{{ $t.love }}</option>
-                      <option value="anger">{{ $t.anger }}</option>
-                      <option value="fear">{{ $t.fear }}</option>
-                      <option value="surprise">{{ $t.surprise }}</option>
-                    </select>
-                    <button @click="submitReport" class="btn btn-primary" :disabled="loadingReport || !selectedSentiment || !selectedEmotion">
-                      <span v-if="!loadingReport">{{ $t.report }}</span>
-                      <span v-if="loadingReport"><i class="fas fa-spinner fa-spin"></i></span>
-                    </button>
-                  </div>
-                </div>
-                <!-- Result content -->
-                <h2 class="card-subtitle text-center mb-2">{{ $t.result }}</h2>
-                <p><strong>{{ $t.emotion }}:</strong> {{ $t[analysisResult.emotion] }}</p>
-                <p><strong>{{ $t.sentiment }}:</strong> {{ $t[analysisResult.sentiment] }}</p>
-              </div>
-            </div>
-          </div>
+
+    <div aria-live="polite" aria-atomic="true" class="toast-container">
+      <div class="toast fade central-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000" ref="toast">
+        <div class="toast-header" :class="{'bg-danger text-white': errorMessage, 'bg-success text-white': !errorMessage}">
+          <strong class="me-auto">{{ errorMessage ? $t.error : $t.success }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" @click="clearErrorMessage"></button>
         </div>
-      </div>
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <p>© {{ currentYear }} Antonio Picone. Pathos.</p>
-        <p style="font-size: 10px;">{{ $t.made_in}}</p>
-      </div>
-    </footer>
-  </div>
-
-  <!-- Dark mode toggle button -->
-  <button class="dark-mode-toggle" onclick="toggleDarkMode()" :title="$t.dark_toggle">
-    <i class="fas fa-adjust"></i>
-  </button>
-
-  <!-- Add debug icon -->
-  <button @click="toggleDebug" class="debug-btn" :title="$t.debug_console">
-    <i class="fas fa-bug"></i>
-  </button>
-
-  <!-- Debug console -->
-  <div ref="debugConsole" :class="{ 'debug-console': true, 'visible': debugVisible }" class="container fade-in">
-    <div class="row justify-content-center align-items-end">
-      <div class="col-lg-6">
-        <div class="debug-content">
-          <pre>{{ debugData }}</pre>
-        </div>
+        <div class="toast-body">{{ errorMessage }}</div>
       </div>
     </div>
   </div>
 
-  <!-- Include Language Detect -->
+  <!-- Scripts -->
   <script src='https://github.com/wooorm/franc/releases/download/3.0.0/franc-min.js'></script>
-  <!-- Include country-flag-emoji-polyfill for flag consistency -->
   <script type="module" defer>
     import { polyfillCountryFlagEmojis } from "https://cdn.skypack.dev/country-flag-emoji-polyfill";
     polyfillCountryFlagEmojis();
   </script>
-  <!-- Include Vue.js -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <!-- Include Vue I18n -->
-  <script src="https://cdn.jsdelivr.net/npm/vue-i18n@9.11.0/dist/vue-i18n.global.min.prod.js"></script>
-  <!-- Include Axios -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <!-- Include Font Awesome -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-
-    // Define language files
-    const messages = {
+const messages = {
       en: {
-        emotion_detection: 'Emotion Detection',
+        emotion_detection: 'Pathos',
         emotion: "Emotion",
         sentiment: "Sentiment",
-        textarea_placeholder: 'Enter text here...',
+        textarea_placeholder: 'Type here... and let the text spill the emotions!',
         analyze: 'Analyze',
         chars_to_lang: 'chars to know the language',
         chars_remaining: 'characters remaining',
         loading: 'Loading...',
         result: 'Result',
-        close: 'Close',
-        debug_console: 'Debug Console',
         dark_toggle: 'Toggle Dark Mode',
-        ita: 'Italian',
-        eng: 'English',
-        por: 'Portuguese',
         sadness: 'sadness',
         joy: 'joy',
         love: 'love',
@@ -621,24 +783,26 @@
         neutral: 'neutral',
         negative: 'negative',
         report: 'Report',
-        made_in: 'Proudly made in 🇮🇹 and 🇧🇷'
+        made_in: 'Proudly made in 🇮🇹 and 🇧🇷',
+        ita: 'Italian',
+        eng: 'English',
+        por: 'Portuguese',
+        logout_success: 'Logged out successfully',
+        logout_error: 'Logout failed',
+        success: 'Success',
+        error: 'Error'
       },
       it: {
-        emotion_detection: 'Analisi delle emozioni',
+        emotion_detection: 'Pathos',
         emotion: "Emozione",
         sentiment: "Sentimento",
-        textarea_placeholder: 'Inserisci qui il tuo testo...',
+        textarea_placeholder: 'Scrivi qui… e lascia che il testo parli per sé!',
         analyze: 'Analizza',
         chars_to_lang: 'caratteri per la lingua',
         chars_remaining: 'caratteri rimanenti',
         loading: 'Caricamento...',
         result: 'Risultato',
-        close: 'Chiudi',
-        debug_console: 'Console di debug',
         dark_toggle: 'Attiva/Disattiva modalità notte',
-        ita: 'Italiano',
-        eng: 'Inglese',
-        por: 'Portoghese',
         sadness: 'tristezza',
         joy: 'gioia',
         love: 'amore',
@@ -649,24 +813,26 @@
         neutral: 'neutro',
         negative: 'negativo',
         report: 'Segnala',
-        made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷'
+        made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷',
+        ita: 'Italiano',
+        eng: 'Inglese',
+        por: 'Portoghese',
+        logout_success: 'Disconnessione avvenuta con successo',
+        logout_error: 'Disconnessione fallita',
+        success: 'Successo',
+        error: 'Errore'
       },
       pt: {
-        emotion_detection: 'Análise das emoções',
+        emotion_detection: 'Pathos',
         emotion: "Emoção",
         sentiment: "Sentimento",
-        textarea_placeholder: 'Digite seu texto aqui...',
+        textarea_placeholder: 'Digite aqui… e veja o texto revelar as emoções!',
         analyze: 'Analisar',
         chars_to_lang: 'caracteres para reconhecer o idioma',
         chars_remaining: 'caracteres restantes',
         loading: 'Carregando...',
         result: 'Resultado',
-        close: 'Fechar',
-        debug_console: 'Console de debug',
         dark_toggle: 'Alternar modo escuro',
-        ita: 'Italiano',
-        eng: 'Inglês',
-        por: 'Português',
         sadness: 'tristeza',
         joy: 'felicidade',
         love: 'amor',
@@ -677,8 +843,15 @@
         neutral: 'neutro',
         negative: 'negativo',
         report: 'Reportar',
-        made_in: 'Orgulhosamente feito na 🇮🇹 e no 🇧🇷'
-      },
+        made_in: 'Orgulhosamente feito em 🇮🇹 e 🇧🇷',
+        ita: 'Italiano',
+        eng: 'Inglês',
+        por: 'Português',
+        logout_success: 'Desconectado com sucesso',
+        logout_error: 'Falha ao desconectar',
+        success: 'Sucesso',
+        error: 'Erro'
+      }
     };
 
     new Vue({
@@ -686,224 +859,150 @@
       data() {
         return {
           textInput: '',
-          detectedLanguage: '',
+          detectedLanguage: 'undefined',
           analysisResult: null,
           loading: false,
           loadingReport: false,
           charLimit: 500,
-          debugVisible: false, // Initially set to false to hide the debug console
-          debugConsole: null,
-          debugData: `${new Date().toLocaleString()}\t Ready\n`, // Initialize debugData with current time and 'Ready'
-          locale: this.locale,
           errorMessage: '',
           reportOverlayVisible: false,
           selectedSentiment: '',
           selectedEmotion: '',
-          currentYear: new Date().getFullYear()
+          currentYear: new Date().getFullYear(),
+          locale: 'en'
         };
       },
       created() {
-        // Detect browser's preferred language
         const browserLanguage = navigator.language.substring(0, 2);
-        // Set the initial locale based on the browser's preferred language
-        const initialLocale = Object.keys(messages).includes(browserLanguage) ? browserLanguage : 'en';
-        // Set the initial locale for the Vue instance
-        this.locale = initialLocale;
+        this.locale = Object.keys(messages).includes(browserLanguage) ? browserLanguage : 'en';
         document.documentElement.lang = this.locale;
-        // Apply dark mode preference when the page renders
-        applyDarkModePreference();
-      },
-      mounted() {
-        // Access the debug console element after it's mounted to the DOM
-        this.debugConsole = this.$refs.debugConsole;
+        this.applyDarkModePreference();
       },
       methods: {
-        // Method to change language
-        switchLocale(locale) {
-          this.locale = locale;
-        },
         handleKeyPress(event) {
-          // Check if the button is not disabled (text length > 15)
-          if (this.textInput.length > 15) {
-            // For mobile (Enter key) or desktop (Ctrl+Enter)
-            if (event.key === 'Enter' && (event.ctrlKey || this.isMobileDevice())) {
-              this.analyzeText();
-              event.preventDefault(); // Prevent default behavior (new line in textarea)
-            }
+          if (this.textInput.length > 15 && event.key === 'Enter' && (event.ctrlKey || this.isMobileDevice())) {
+            this.analyzeText();
+            event.preventDefault();
           }
         },
         isMobileDevice() {
           return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         },
         async analyzeText() {
-          // Close analysis result if it's open
           this.closeAnalysisResult();
           try {
             this.loading = true;
-            // Make a POST request to the API
-            const response = await axios.post('/api/emotion/', { text: this.textInput.trim(), probs: true }, {});
-            // Set analysis result based on API response
+            const response = await axios.post('/api/emotion/', { text: this.textInput.trim(), probs: true });
             this.analysisResult = response.data;
-            // Append message to debug console
-            const currentTime = new Date().toLocaleString();
-            const debugMessage = `${currentTime}\t${JSON.stringify(this.analysisResult)}`;
-            this.debugData += debugMessage + '\n';
-            this.scrollDebugConsoleToBottom();
           } catch (error) {
-            console.error('Error analyzing text:', error);
-            // Show error toast
-            this.showToast(error.message);
+            this.showToast(error.message, true);
           } finally {
             this.loading = false;
           }
         },
         updateCharCountAndDetectLanguage() {
-          this.updateCharCount();
+          if (this.textInput.length > this.charLimit) this.textInput = this.textInput.slice(0, this.charLimit);
           this.detectLanguage();
         },
-        updateCharCount() {
-          if (this.textInput.length > this.charLimit) {
-            this.textInput = this.textInput.slice(0, this.charLimit);
-          }
-        },
         detectLanguage() {
-          var supportedLanguages = ["eng", "ita", "por"]
-          var languageCode = franc(this.textInput, { whitelist: supportedLanguages, minLength: 60 });
-          this.detectedLanguage = this.$t[languageCode]
+          const supportedLanguages = ["eng", "ita", "por"];
+          const languageCode = franc(this.textInput, { whitelist: supportedLanguages, minLength: 60 });
+          const languageMap = {
+            'eng': this.$t.eng,
+            'ita': this.$t.ita,
+            'por': this.$t.por,
+            'und': 'undefined'
+          };
+          this.detectedLanguage = languageMap[languageCode] || 'undefined';
         },
         closeAnalysisResult() {
           this.analysisResult = null;
         },
-        toggleDebug() {
-          // Update debug visibility
-          this.debugVisible = !this.debugVisible;
+        toggleDarkMode() {
+          document.body.classList.toggle('dark-mode');
+          localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         },
-        bannerBackgroundColor() {
-          if (this.analysisResult && this.analysisResult.sentiment === 'positive') {
-            return '#198754'; // Green for positive sentiment
-          } 
-          else if (this.analysisResult && this.analysisResult.sentiment === 'negative') {
-            return '#dc3545'; // Red for negative sentiment
-          }
-          else {
-            return '#6c757d'; // Grey for neutral sentiment
-          }
+        applyDarkModePreference() {
+          let isDarkMode = localStorage.getItem('darkMode');
+          if (isDarkMode === null) isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          else isDarkMode = isDarkMode === 'true';
+          if (isDarkMode) document.body.classList.add('dark-mode');
+        },
+        showToast(msg, isError = false) {
+          console.log('Showing toast:', msg, 'isError:', isError);
+          this.errorMessage = msg;
+          
+          this.$nextTick(() => {
+            const toastEl = this.$refs.toast;
+            
+            const toastHeader = toastEl.querySelector('.toast-header');
+            if (toastHeader) {
+              if (isError) {
+                toastHeader.classList.add('bg-danger', 'text-white');
+                toastHeader.classList.remove('bg-success');
+              } else {
+                toastHeader.classList.add('bg-success', 'text-white');
+                toastHeader.classList.remove('bg-danger');
+              }
+              
+              const headerTitle = toastHeader.querySelector('strong');
+              if (headerTitle) {
+                headerTitle.textContent = isError ? this.$t.error : this.$t.success;
+              }
+            }
+            
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+          });
         },
         clearErrorMessage() {
-          // Add a class to trigger the fade-out animation
-          const toastElement = document.getElementById('toastPlacement');
-          toastElement.classList.add('fade-out');
-
-          // Delay the removal of the 'fade-out' class
-          setTimeout(() => {
-            // Clear the error message
-            this.errorMessage = '';
-            // Remove the 'fade-out' class to prevent future fade-out animations
-            toastElement.classList.remove('fade-out');
-          }, 500); // Adjust the timeout to match the duration of the fade-out animation
+          this.errorMessage = '';
         },
-        showToast(message) {
-          // Check if there's already a toast being displayed
-          if (!this.errorMessage) {
-            // If not, set the error message
-            this.errorMessage = message;
-            // Automatically clear the error message after a timeout
-            setTimeout(() => {
-              this.clearErrorMessage();
-            }, 5000); // Adjust the timeout duration as needed (5000 milliseconds = 5 seconds)
+        openReportOverlay(event) {
+          console.log('Opening report overlay');
+          this.reportOverlayVisible = true;
+          event.stopPropagation();
+        },
+        closeReportOverlay(event) {
+          console.log('Attempting to close report overlay');
+          if (event.target.classList.contains('report-overlay')) {
+            console.log('Closing report overlay');
+            this.reportOverlayVisible = false;
           }
         },
-        appendDebugMessage(message) {
-          // Append debug message to debugData
-          this.debugData += message + '\n';
-          // Scroll debug console to bottom
-          this.scrollDebugConsoleToBottom();
-        },
-        // Method to scroll debug console to bottom
-        scrollDebugConsoleToBottom() {
-          const debugContent = document.querySelector('.debug-content');
-          // Ensure debugContent is available
-          if (debugContent) {
-            // Scroll debug content to bottom
-            debugContent.scrollTop = debugContent.scrollHeight;
-          }
-        },
-        submitReport() {
-          // Enable loading state
+        async submitReport() {
           this.loadingReport = true;
-
-          // Prepare the data to be sent
-          const data = {
-            text: this.textInput.trim(),
-            sentiment: this.selectedSentiment,
-            emotion: this.selectedEmotion
-          };
-
-          // Make a POST request to the API endpoint
-          axios.post('/api/feedback/', data)
-            .then(response => {
-              // Handle success response if needed
-              console.log('Feedback submitted successfully:', response.data);
-            })
-            .catch(error => {
-              // Handle error response if needed
-              console.error('Error submitting feedback:', error);
-              this.showToast(`Feedback: ${error.message}`)
-            })
-            .finally(() => {
-              // Reset loading state
-              this.loadingReport = false;
-              // Reset selected values
-              this.selectedSentiment = '';
-              this.selectedEmotion = '';
-              // Hide overlay
-              this.reportOverlayVisible = false;
-            });
+          const data = { text: this.textInput.trim(), sentiment: this.selectedSentiment, emotion: this.selectedEmotion };
+          try {
+            await axios.post('/api/feedback/', data);
+            this.showToast('Feedback submitted successfully');
+            this.reportOverlayVisible = false;
+          } catch (error) {
+            this.showToast(`Feedback: ${error.message}`, true);
+          } finally {
+            this.loadingReport = false;
+            this.selectedSentiment = '';
+            this.selectedEmotion = '';
+          }
         },
-        toggleReportOverlay() {
-          this.reportOverlayVisible = !this.reportOverlayVisible;
-        },
+        async logout() {
+          try {
+            await axios.get('/api/logout/');
+            this.showToast(this.$t.logout_success);
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 1000);
+          } catch (error) {
+            this.showToast(this.$t.logout_error, true);
+          }
+        }
       },
       computed: {
-        // Computed property to access translations
         $t() {
           return messages[this.locale];
-        },
-        // Computed property to determine if both sentiment and emotion are selected
-        isReportButtonDisabled() {
-          return !this.selectedSentiment || !this.selectedEmotion;
-        },
+        }
       }
     });
-
-    function toggleDarkMode() {
-      const body = document.body;
-      body.classList.toggle('dark-mode');
-      
-      // Save dark mode preference in localStorage
-      const isDarkMode = body.classList.contains('dark-mode');
-      localStorage.setItem('darkMode', isDarkMode);
-    }
-
-    // Function to apply dark mode based on the preference stored in localStorage
-    function applyDarkModePreference() {
-        let isDarkMode = localStorage.getItem('darkMode');
-        if (isDarkMode === null) {
-            // Check if the device prefers dark mode
-            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        } else {
-            isDarkMode = isDarkMode === 'true';
-        }
-        const body = document.body;
-        if (isDarkMode) {
-            body.classList.add('dark-mode');
-        } else {
-            body.classList.remove('dark-mode');
-        }
-        // Save dark mode preference in localStorage
-        localStorage.setItem('darkMode', isDarkMode);
-        this.isDarkMode = isDarkMode; // Update the Vue data property
-    }
   </script>
 </body>
 </html>

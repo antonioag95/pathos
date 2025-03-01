@@ -496,6 +496,27 @@ async def create_item(input: InputAPI, request: Request, current_user: Annotated
     # Return the dictionary
     return response
 
+@app.get("/api/logout/")
+async def logout(request: Request, base_response: BaseResponse = Depends(get_base_response)):
+    """
+    Logout endpoint that invalidates the access token by clearing the cookie.
+    """
+    # Log the logout action
+    logging.info(f"{get_client_ip(request)} - {request.url.path} - User logout")
+    
+    # Calculate the response time
+    end_time = time.time()
+    response_time = int((end_time - request.state.start_time) * 1000)  # Convert to milliseconds
+    base_response.response_ms = response_time
+    
+    # Create a redirect response to the login page
+    response = RedirectResponse(url='/login', status_code=status.HTTP_303_SEE_OTHER)
+    
+    # Clear the access_token cookie by setting an empty value and expiring it
+    response.delete_cookie(key="access_token")
+    
+    return response
+
 @app.post("/api/feedback/")
 async def provide_prediction_feedback(input: FeedbackAPI, current_user: Annotated[User, Depends(get_current_active_user)], request: Request, base_response: BaseResponse = Depends(get_base_response)):
     # Extract the feedback data from the request

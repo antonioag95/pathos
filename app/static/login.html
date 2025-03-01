@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pathos - Login/Signup</title>
+  <link rel="icon" type="image/png" href="/img/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="/img/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Pathos" />
+  <link rel="manifest" href="/img/favicon/site.webmanifest" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -87,7 +93,7 @@
       border: none;
       border-bottom: 2px solid #ddd;
       border-radius: 0;
-      padding: 0.6rem 0;
+      padding: 0.6rem 2.5rem 0.6rem 0; /* Adjusted padding for icon */
       background: transparent;
       transition: all 0.3s ease;
       font-size: 0.9rem;
@@ -125,6 +131,10 @@
       top: -0.8rem;
       font-size: 0.7rem;
       color: var(--primary-color);
+    }
+
+    .form-group input[type="date"] {
+      padding-right: 0;
     }
 
     .btn-auth {
@@ -216,7 +226,6 @@
       transition: background-color 5000s ease-in-out 0s;
     }
 
-    /* Fix calendar icon visibility in dark mode */
     .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
       opacity: 0.8;
@@ -240,6 +249,30 @@
 
     .dark-mode .card-header::before {
       background: rgba(0,0,0,0.6);
+    }
+
+    /* Password toggle icon styling */
+    .password-toggle-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .password-toggle-icon:hover {
+      color: var(--primary-color);
+    }
+
+    .dark-mode .password-toggle-icon {
+      color: #aaa;
+    }
+
+    .dark-mode .password-toggle-icon:hover {
+      color: var(--secondary-color);
     }
 
     /* Animations */
@@ -300,8 +333,20 @@
             <label for="username" class="form-label">{{ $t.username }}</label>
           </div>
           <div class="form-group">
-            <input type="password" class="form-control" id="password" v-model="password" placeholder=" ">
+            <input 
+              :type="showLoginPassword ? 'text' : 'password'" 
+              class="form-control" 
+              id="password" 
+              v-model="password" 
+              placeholder=" "
+            >
             <label for="password" class="form-label">{{ $t.password }}</label>
+            <span 
+              class="password-toggle-icon" 
+              @click="showLoginPassword = !showLoginPassword"
+            >
+              <i :class="showLoginPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </span>
           </div>
           <button type="submit" class="btn-auth" :disabled="!isLoginValid || isLoading">
             <span v-if="!isLoading">{{ $t.login }}</span>
@@ -334,8 +379,20 @@
             <label for="email" class="form-label">{{ $t.email }}</label>
           </div>
           <div class="form-group">
-            <input type="password" class="form-control" id="signup-password" v-model="signupData.password" placeholder=" ">
+            <input 
+              :type="showSignupPassword ? 'text' : 'password'" 
+              class="form-control" 
+              id="signup-password" 
+              v-model="signupData.password" 
+              placeholder=" "
+            >
             <label for="signup-password" class="form-label">{{ $t.password }}</label>
+            <span 
+              class="password-toggle-icon" 
+              @click="showSignupPassword = !showSignupPassword"
+            >
+              <i :class="showSignupPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </span>
           </div>
           <button type="submit" class="btn-auth" :disabled="!isSignupValid || isLoading">
             <span v-if="!isLoading">{{ $t.signup }}</span>
@@ -359,11 +416,10 @@
       <i class="fas fa-adjust"></i>
     </button>
 
-    <!-- Top Toast container for notifications -->
     <div aria-live="polite" aria-atomic="true" class="toast-container">
       <div class="toast fade central-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000" ref="toast">
         <div class="toast-header" :class="{'bg-danger text-white': errorMessage, 'bg-success text-white': !errorMessage}">
-          <strong class="me-auto">{{ errorMessage ? 'Error' : 'Success' }}</strong>
+          <strong class="me-auto">{{ errorMessage ? $t.error : $t.success }}</strong>
           <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">{{ message }}</div>
@@ -395,12 +451,13 @@
         signup_error: 'Registration failed',
         made_in: 'Proudly made in 🇮🇹 and 🇧🇷',
         dark_toggle: 'Toggle Dark Mode',
-        // New error translations
         error_invalid_token: "Invalid token provided.",
         error_inactive: "Your account is not active. Please contact an administrator.",
         error_incorrect: "Either username or password is incorrect.",
         error_username_exists: "Username already exists.",
-        error_email_exists: "Email already exists."
+        error_email_exists: "Email already exists.",
+        success: 'Success',
+        error: 'Error'
       },
       it: {
         title: 'Pathos',
@@ -418,12 +475,13 @@
         signup_error: 'Registrazione fallita',
         made_in: 'Fatto con orgoglio in 🇮🇹 e 🇧🇷',
         dark_toggle: 'Attiva/Disattiva modalità notte',
-        // New error translations
         error_invalid_token: "Token non valido.",
         error_inactive: "Il tuo account non è attivo. Contatta l'amministratore.",
         error_incorrect: "Nome utente o password errati.",
         error_username_exists: "Nome utente già esistente.",
-        error_email_exists: "Email già esistente."
+        error_email_exists: "Email già esistente.",
+        success: 'Successo',
+        error: 'Errore'
       },
       pt: {
         title: 'Pathos',
@@ -441,12 +499,13 @@
         signup_error: 'Registro falhou',
         made_in: 'Orgulhosamente feito em 🇮🇹 e 🇧🇷',
         dark_toggle: 'Alternar modo escuro',
-        // New error translations
         error_invalid_token: "Token inválido.",
         error_inactive: "Sua conta não está ativa. Por favor, contate o administrador.",
         error_incorrect: "Usuário ou senha incorretos.",
         error_username_exists: "Nome de usuário já existe.",
-        error_email_exists: "Email já existe."
+        error_email_exists: "Email já existe.",
+        success: 'Sucesso',
+        error: 'Erro'
       }
     };
 
@@ -469,7 +528,9 @@
         errorMessage: false,
         locale: 'en',
         currentYear: new Date().getFullYear(),
-        isDarkMode: false
+        isDarkMode: false,
+        showLoginPassword: false,  // Toggle for login password visibility
+        showSignupPassword: false // Toggle for signup password visibility
       },
       created() {
         const browserLanguage = navigator.language.substring(0, 2);
@@ -530,8 +591,6 @@
         async signup() {
           this.isLoading = true;
           this.message = '';
-
-          // Trim all input values before sending
           const trimmedData = {
             name: this.signupData.name.trim(),
             surname: this.signupData.surname.trim(),
@@ -595,10 +654,6 @@
         }
       }
     });
-  </script>
-  <script type="module" defer>
-    import { polyfillCountryFlagEmojis } from "https://cdn.skypack.dev/country-flag-emoji-polyfill";
-    polyfillCountryFlagEmojis();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

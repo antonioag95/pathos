@@ -5,7 +5,7 @@
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.x-green?style=flat-square)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.68%2B-red?style=flat-square)
 ![BERT](https://img.shields.io/badge/BERT-fine--tuned-orange?style=flat-square)
-![Docker]([Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white))
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white)
 
 <p align="center">
   <img width="256" height="171" src="app/static/img/emotions-banner.jpg">

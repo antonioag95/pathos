@@ -19,7 +19,7 @@ Pathos addresses the accessibility limitations of an AI model by wrapping it in 
 
 Key features:
 - **Emotion Detection**: Identifies six distinct emotions from text input.
-- **Sentiment Analysis**: Classifies text as positive, neutral, or negative.
+- **Sentiment Analysis**: Classifies text as positive, or negative.
 - **Multilingual Support**: Processes Italian, English, and Portuguese.
 - **Secure Authentication**: Uses OAuth2 with JWTs in HTTP-only cookies.
 - **Responsive Design**: Works seamlessly on desktop and mobile, with dark mode.

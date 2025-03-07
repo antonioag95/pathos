@@ -67,7 +67,7 @@ feedback = Feedback(auth.db)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Model and tokenizer paths
-model_path = "./models/BERT_ft_epoch3_TestScore_0.9167767129186862.bin"
+model_path = "./models/pathos_v2.bin"
 tokenizer_path = "google-bert/bert-base-multilingual-uncased"
 
 # Emotion labels mapping

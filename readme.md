@@ -58,7 +58,7 @@ JWT_SECRET_KEY=[YOUR_JWT_SECRET_KEY]    # Replace with a 32-byte hex string, gen
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/username/pathos.git
+   git clone https://github.com/antonioag/pathos.git
    cd pathos
    ```
 

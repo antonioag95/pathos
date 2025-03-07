@@ -5,8 +5,11 @@
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.x-green?style=flat-square)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.68%2B-red?style=flat-square)
 ![BERT](https://img.shields.io/badge/BERT-fine--tuned-orange?style=flat-square)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white)
 
+<p align="center">
+  <img width="256" height="171" src="app/static/img/emotions-banner.jpg">
+</p>
 
 **Pathos** is a web-based application designed to democratize access to sentiment and emotion detection, developed as part of my doctoral thesis at the **Università di Catania**. This project integrates a powerful AI model with an intuitive interface, enabling users to analyze text without programming knowledge.
 
@@ -16,7 +19,7 @@ Pathos addresses the accessibility limitations of an AI model by wrapping it in 
 
 Key features:
 - **Emotion Detection**: Identifies six distinct emotions from text input.
-- **Sentiment Analysis**: Classifies text as positive, neutral, or negative.
+- **Sentiment Analysis**: Classifies text as positive, or negative.
 - **Multilingual Support**: Processes Italian, English, and Portuguese.
 - **Secure Authentication**: Uses OAuth2 with JWTs in HTTP-only cookies.
 - **Responsive Design**: Works seamlessly on desktop and mobile, with dark mode.
@@ -55,7 +58,7 @@ JWT_SECRET_KEY=[YOUR_JWT_SECRET_KEY]    # Replace with a 32-byte hex string, gen
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/username/pathos.git
+   git clone https://github.com/antonioag95/pathos.git
    cd pathos
    ```
 

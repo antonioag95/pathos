@@ -26,7 +26,7 @@ class Auth():
     """
     def __init__(self):
         # Set secret key, algorithm, and expiry time
-        self.SECRET_KEY = "1d07ff195af3f7f222ac883c0ad16fcdcf9665801c7177159f37cf33ee8cd5f7" # openssl rand -hex 32
+        self.SECRET_KEY = os.getenv("JWT_SECRET_KEY") # openssl rand -hex 32
         self.ALGORITHM = "HS256"
         self.ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

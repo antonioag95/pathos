@@ -4,3 +4,4 @@ venv/
 .venv/
 *.model
 *.bin
+.env
